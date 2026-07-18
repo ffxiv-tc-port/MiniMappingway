@@ -2,7 +2,7 @@
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Plugin;
-using Dalamud.Bindings.ImGui;
+using ImGuiNET;
 using MiniMappingway.Api;
 using MiniMappingway.Manager;
 using MiniMappingway.Service;

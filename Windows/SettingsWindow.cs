@@ -1,6 +1,6 @@
 ﻿using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
-using Dalamud.Bindings.ImGui;
+using ImGuiNET;
 using MiniMappingway.Manager;
 using MiniMappingway.Model;
 using MiniMappingway.Service;
