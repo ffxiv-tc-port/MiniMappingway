@@ -11,7 +11,7 @@ namespace MiniMappingway.Windows;
 
 public class SettingsWindow : Window
 {
-    public SettingsWindow() : base("Mini-Mappingway Settings")
+    public SettingsWindow() : base("Mini-Mappingway 設定")
     {
         Size = new Vector2(450, 405);
         SizeCondition = ImGuiCond.Once;
@@ -29,16 +29,16 @@ public class SettingsWindow : Window
     {
         // can't ref a property, so use a local copy
         var enabled = ServiceManager.Configuration.Enabled;
-        if (ImGui.Checkbox("Enabled", ref enabled))
+        if (ImGui.Checkbox("啟用", ref enabled))
         {
             ServiceManager.Configuration.Enabled = enabled;
             ServiceManager.Configuration.Save();
         }
 
-        ImGui.TextColored(new Vector4(255, 0, 0, 255), "For now FC members are found by comparing FC tags.");
-        ImGui.TextColored(new Vector4(255, 0, 0, 255), "If you have a common FC tag you may wish to disable this.");
+        ImGui.TextColored(new Vector4(255, 0, 0, 255), "目前是透過比對公會標籤來尋找公會成員。");
+        ImGui.TextColored(new Vector4(255, 0, 0, 255), "若您的公會標籤較常見，您可能會想停用此功能。");
 
-        ImGui.Text("Marker settings, ordered by priority:");
+        ImGui.Text("標記設定（依優先度排序）：");
 
         foreach (var source in ServiceManager.NaviMapManager.SourceDataDict.OrderBy(x => x.Value.Priority))
         {
@@ -49,7 +49,7 @@ public class SettingsWindow : Window
                 ImGui.Text(source.Key);
 
                 var enabledLocal = sourceDataLocal.Enabled;
-                if (ImGui.Checkbox("Enabled", ref enabledLocal))
+                if (ImGui.Checkbox("啟用", ref enabledLocal))
                 {
                     sourceDataLocal.Enabled = enabledLocal;
                 }
@@ -61,7 +61,7 @@ public class SettingsWindow : Window
 
                 if (source.Key == FinderService.EveryoneKey)
                 {
-                    ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1), "  \"Everyone\" is always the lowest priority");
+                    ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1), "  「所有人」永遠是最低優先度");
 
                 }
                 else
@@ -89,17 +89,17 @@ public class SettingsWindow : Window
                     ImGui.SameLine();
                     if (isPriorityError)
                     {
-                        ImGui.TextColored(new Vector4(1, 0, 0, 1), $"Priority {tempPriority} is already taken");
+                        ImGui.TextColored(new Vector4(1, 0, 0, 1), $"優先度 {tempPriority} 已被使用");
                     }
                     else
                     {
-                        ImGui.Text("Priority, higher shows on top of lower");
+                        ImGui.Text("優先度，數值越高顯示在越上層");
                     }
 
                 }
 
                 var color = ImGui.ColorConvertU32ToFloat4(source.Value.Color);
-                ImGui.Text("Marker Colour. Click the colored square for a picker.");
+                ImGui.Text("標記顏色。點擊色塊可開啟選色器。");
                 if (ImGui.ColorEdit4("##color", ref color, ImGuiColorEditFlags.NoAlpha))
                 {
 
@@ -109,26 +109,26 @@ public class SettingsWindow : Window
 
                 }
                 var circleSizeLocal = source.Value.CircleSize;
-                if (ImGui.SliderInt("Circle Size", ref circleSizeLocal, 1, 20))
+                if (ImGui.SliderInt("圓圈大小", ref circleSizeLocal, 1, 20))
                 {
                     sourceDataLocal.CircleSize = circleSizeLocal;
                 }
 
                 var border = sourceDataLocal.ShowBorder;
-                if (ImGui.Checkbox("Show Border", ref border))
+                if (ImGui.Checkbox("顯示邊框", ref border))
                 {
                     sourceDataLocal.ShowBorder = border;
                 }
 
                 var darkeningAmount = sourceDataLocal.BorderDarkeningAmount;
-                if (ImGui.SliderFloat("Border Brightness", ref darkeningAmount, 0.0f, 2f))
+                if (ImGui.SliderFloat("邊框亮度", ref darkeningAmount, 0.0f, 2f))
                 {
                     sourceDataLocal.BorderDarkeningAmount = darkeningAmount;
                     sourceDataLocal.BorderValid = false;
                 }
 
                 var borderRadius = sourceDataLocal.BorderRadius;
-                if (ImGui.SliderInt("Border Radius", ref borderRadius, 1, 10))
+                if (ImGui.SliderInt("邊框半徑", ref borderRadius, 1, 10))
                 {
                     sourceDataLocal.BorderRadius = borderRadius;
                 }

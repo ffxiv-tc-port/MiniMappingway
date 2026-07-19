@@ -47,7 +47,7 @@ public sealed class Plugin : IDalamudPlugin
 
         ServiceManager.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
-            HelpMessage = "Opens Mini-Mappingway settings"
+            HelpMessage = "開啟 Mini-Mappingway 設定"
         });
 
         ServiceManager.CommandManager.AddHandler(CommandNameDebug, new CommandInfo(OnCommand));
