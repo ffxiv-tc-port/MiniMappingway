@@ -98,4 +98,46 @@
 	<resheader name="writer">
 		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
 	</resheader>
+	<data name="BorderBrightness" xml:space="preserve">
+		<value>Border Brightness</value>
+	</data>
+	<data name="BorderRadius" xml:space="preserve">
+		<value>Border Radius</value>
+	</data>
+	<data name="CircleSize" xml:space="preserve">
+		<value>Circle Size</value>
+	</data>
+	<data name="CommandHelpMessage" xml:space="preserve">
+		<value>Opens Mini-Mappingway settings</value>
+	</data>
+	<data name="Enabled" xml:space="preserve">
+		<value>Enabled</value>
+	</data>
+	<data name="EveryoneLowestPriority" xml:space="preserve">
+		<value>"Everyone" is always the lowest priority</value>
+	</data>
+	<data name="FcTagCommonNotice" xml:space="preserve">
+		<value>If you have a common FC tag you may wish to disable this.</value>
+	</data>
+	<data name="FcTagComparisonNotice" xml:space="preserve">
+		<value>For now FC members are found by comparing FC tags.</value>
+	</data>
+	<data name="MarkerColourDescription" xml:space="preserve">
+		<value>Marker Colour. Click the colored square for a picker.</value>
+	</data>
+	<data name="MarkerSettingsHeader" xml:space="preserve">
+		<value>Marker settings, ordered by priority:</value>
+	</data>
+	<data name="PriorityDescription" xml:space="preserve">
+		<value>Priority, higher shows on top of lower</value>
+	</data>
+	<data name="PriorityTaken" xml:space="preserve">
+		<value>Priority {0} is already taken</value>
+	</data>
+	<data name="SettingsWindowTitle" xml:space="preserve">
+		<value>Mini-Mappingway Settings</value>
+	</data>
+	<data name="ShowBorder" xml:space="preserve">
+		<value>Show Border</value>
+	</data>
 </root>
