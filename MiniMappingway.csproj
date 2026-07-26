@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Dalamud.NET.Sdk/12.0.2">
   <PropertyGroup>
-    <Authors>JayceOfSpades, Lother</Authors>
+    <Authors>JayceOfSpades</Authors>
     <Company></Company>
     <Description>MiniMappingway</Description>
     <Copyright></Copyright>
-    <PackageProjectUrl>https://github.com/Lother/MiniMappingway</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/ffxiv-tc-port/MiniMappingway</PackageProjectUrl>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -46,12 +46,12 @@
 
 	<ProjectExtensions>
 		<DalamudPlugin>
-			<Author>JayceOfSpades, Lother</Author>
+			<Author>JayceOfSpades</Author>
 			<Name>Mini-Mappingway</Name>
 			<Punchline>A plugin to show your friends and FC members on the minimap.</Punchline>
 			<Description>A plugin to show your friends and FC members on the minimap. Customise the markers and toggle whether you want to see friends, FC members, or both, in the settings! IMPORTANT: If you have your minimap rotation locked, please enable 'Minimap Locked' in the settings.</Description>
-			<RepoUrl>https://github.com/Lother/MiniMappingway</RepoUrl>
-			<IconUrl>https://raw.githubusercontent.com/Lother/DalamudPluginsTC/main/icons/MiniMappingway.png</IconUrl>
+			<RepoUrl>https://github.com/ffxiv-tc-port/MiniMappingway</RepoUrl>
+			<IconUrl>https://raw.githubusercontent.com/ffxiv-tc-port/DalamudPluginsTC/main/icons/MiniMappingway.png</IconUrl>
 			<Tags>
 				<Tag>Friend</Tag>
 				<Tag>Minimap</Tag>
