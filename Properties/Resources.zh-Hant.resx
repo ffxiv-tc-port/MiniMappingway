@@ -64,7 +64,7 @@
 		<value>目前是透過比對公會標籤來尋找公會成員。</value>
 	</data>
 	<data name="MarkerColourDescription" xml:space="preserve">
-		<value>標記顏色。點擊色塊可開啟選色器。</value>
+		<value>標記顏色。點選色塊可開啟選色器。</value>
 	</data>
 	<data name="MarkerSettingsHeader" xml:space="preserve">
 		<value>標記設定（依優先度排序）：</value>

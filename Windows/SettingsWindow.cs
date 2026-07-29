@@ -45,6 +45,11 @@ public class SettingsWindow : Window
         {
             ImGui.PushID(source.Key);
             var sourceDataLocal = new SourceData(source.Value);
+            // Values are always applied to sourceDataLocal immediately below (live preview),
+            // but the config file is only written once editing on a widget actually finishes
+            // (mouse released / edit deactivated) — otherwise dragging a slider or color
+            // picker writes the config to disk every single frame.
+            var shouldSave = false;
             if (ImGui.BeginListBox($"##list{source.Key}", new Vector2(-1, 210 * ImGuiHelpers.GlobalScale)))
             {
                 ImGui.Text(source.Key);
@@ -54,6 +59,7 @@ public class SettingsWindow : Window
                 {
                     sourceDataLocal.Enabled = enabledLocal;
                 }
+                if (ImGui.IsItemDeactivatedAfterEdit()) shouldSave = true;
 
                 ImGui.SameLine(90);
 
@@ -84,6 +90,7 @@ public class SettingsWindow : Window
 
                         sourceDataLocal.Priority = tempPriority;
                     }
+                    if (ImGui.IsItemDeactivatedAfterEdit()) shouldSave = true;
                     isPriorityError = ServiceManager.NaviMapManager.SourceDataDict.Any(x => x.Value.Priority == tempPriority && x.Key != source.Key);
 
                     ImGui.PopItemWidth();
@@ -109,17 +116,20 @@ public class SettingsWindow : Window
                     sourceDataLocal.BorderValid = false;
 
                 }
+                if (ImGui.IsItemDeactivatedAfterEdit()) shouldSave = true;
                 var circleSizeLocal = source.Value.CircleSize;
                 if (ImGui.SliderInt(Resources.CircleSize, ref circleSizeLocal, 1, 20))
                 {
                     sourceDataLocal.CircleSize = circleSizeLocal;
                 }
+                if (ImGui.IsItemDeactivatedAfterEdit()) shouldSave = true;
 
                 var border = sourceDataLocal.ShowBorder;
                 if (ImGui.Checkbox(Resources.ShowBorder, ref border))
                 {
                     sourceDataLocal.ShowBorder = border;
                 }
+                if (ImGui.IsItemDeactivatedAfterEdit()) shouldSave = true;
 
                 var darkeningAmount = sourceDataLocal.BorderDarkeningAmount;
                 if (ImGui.SliderFloat(Resources.BorderBrightness, ref darkeningAmount, 0.0f, 2f))
@@ -127,12 +137,14 @@ public class SettingsWindow : Window
                     sourceDataLocal.BorderDarkeningAmount = darkeningAmount;
                     sourceDataLocal.BorderValid = false;
                 }
+                if (ImGui.IsItemDeactivatedAfterEdit()) shouldSave = true;
 
                 var borderRadius = sourceDataLocal.BorderRadius;
                 if (ImGui.SliderInt(Resources.BorderRadius, ref borderRadius, 1, 10))
                 {
                     sourceDataLocal.BorderRadius = borderRadius;
                 }
+                if (ImGui.IsItemDeactivatedAfterEdit()) shouldSave = true;
 
                 ServiceManager.NaviMapManager.SourceDataDict.AddOrUpdate(source.Key, sourceDataLocal, (_, _) => sourceDataLocal);
                 if (sourceDataLocal != ServiceManager.Configuration.SourceConfigs[source.Key])
@@ -142,7 +154,10 @@ public class SettingsWindow : Window
                         ServiceManager.Configuration.SourceConfigs[source.Key] = sourceDataLocal;
 
                     }
-                    ServiceManager.Configuration.Save();
+                    if (shouldSave)
+                    {
+                        ServiceManager.Configuration.Save();
+                    }
                 }
                 ImGui.EndListBox();
 
