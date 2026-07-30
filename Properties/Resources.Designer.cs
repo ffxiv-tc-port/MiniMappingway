@@ -169,6 +169,87 @@ namespace MiniMappingway.Properties {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Dot radius.
+        /// </summary>
+        internal static string PvpRadarDotRadius {
+            get {
+                return ResourceManager.GetString("PvpRadarDotRadius", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enable PvP player radar (on-screen dots).
+        /// </summary>
+        internal static string PvpRadarEnabled {
+            get {
+                return ResourceManager.GetString("PvpRadarEnabled", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enemy colour.
+        /// </summary>
+        internal static string PvpRadarEnemyColor {
+            get {
+                return ResourceManager.GetString("PvpRadarEnemyColor", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Friendly colour.
+        /// </summary>
+        internal static string PvpRadarFriendlyColor {
+            get {
+                return ResourceManager.GetString("PvpRadarFriendlyColor", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to PvP Player Radar.
+        /// </summary>
+        internal static string PvpRadarHeader {
+            get {
+                return ResourceManager.GetString("PvpRadarHeader", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Hide friendly players.
+        /// </summary>
+        internal static string PvpRadarHideFriendly {
+            get {
+                return ResourceManager.GetString("PvpRadarHideFriendly", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Projects nearby players onto the screen. Intended for Frontline and other PvP areas..
+        /// </summary>
+        internal static string PvpRadarNotice {
+            get {
+                return ResourceManager.GetString("PvpRadarNotice", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Only show dots (no player names).
+        /// </summary>
+        internal static string PvpRadarOnlyDot {
+            get {
+                return ResourceManager.GetString("PvpRadarOnlyDot", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Also show outside PvP areas.
+        /// </summary>
+        internal static string PvpRadarOutsidePvp {
+            get {
+                return ResourceManager.GetString("PvpRadarOutsidePvp", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Mini-Mappingway Settings.
         /// </summary>
         internal static string SettingsWindowTitle {

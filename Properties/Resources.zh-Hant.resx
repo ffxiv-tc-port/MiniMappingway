@@ -81,4 +81,31 @@
 	<data name="ShowBorder" xml:space="preserve">
 		<value>顯示邊框</value>
 	</data>
+	<data name="PvpRadarDotRadius" xml:space="preserve">
+		<value>點半徑</value>
+	</data>
+	<data name="PvpRadarEnabled" xml:space="preserve">
+		<value>啟用 PvP 玩家雷達（螢幕標點）</value>
+	</data>
+	<data name="PvpRadarEnemyColor" xml:space="preserve">
+		<value>敵對顏色</value>
+	</data>
+	<data name="PvpRadarFriendlyColor" xml:space="preserve">
+		<value>友方顏色</value>
+	</data>
+	<data name="PvpRadarHeader" xml:space="preserve">
+		<value>PvP 玩家雷達</value>
+	</data>
+	<data name="PvpRadarHideFriendly" xml:space="preserve">
+		<value>不顯示友方玩家</value>
+	</data>
+	<data name="PvpRadarNotice" xml:space="preserve">
+		<value>將可接收到的周圍玩家投影為螢幕標點，主要用於紛爭前線等 PvP 區域。</value>
+	</data>
+	<data name="PvpRadarOnlyDot" xml:space="preserve">
+		<value>僅顯示判定點（不顯示玩家名稱）</value>
+	</data>
+	<data name="PvpRadarOutsidePvp" xml:space="preserve">
+		<value>非 PvP 區域也顯示</value>
+	</data>
 </root>

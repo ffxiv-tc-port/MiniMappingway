@@ -39,6 +39,8 @@ public class SettingsWindow : Window
         ImGui.TextColored(new Vector4(255, 0, 0, 255), Resources.FcTagComparisonNotice);
         ImGui.TextColored(new Vector4(255, 0, 0, 255), Resources.FcTagCommonNotice);
 
+        DrawPvpRadarSettings();
+
         ImGui.Text(Resources.MarkerSettingsHeader);
 
         foreach (var source in ServiceManager.NaviMapManager.SourceDataDict.OrderBy(x => x.Value.Priority))
@@ -165,5 +167,77 @@ public class SettingsWindow : Window
             ImGui.PopID();
         }
 
+    }
+
+    private static void DrawPvpRadarSettings()
+    {
+        if (!ImGui.CollapsingHeader(Resources.PvpRadarHeader))
+        {
+            return;
+        }
+
+        var config = ServiceManager.Configuration;
+
+        var radarEnabled = config.PvpRadarEnabled;
+        if (ImGui.Checkbox(Resources.PvpRadarEnabled, ref radarEnabled))
+        {
+            config.PvpRadarEnabled = radarEnabled;
+            config.Save();
+        }
+
+        ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1), Resources.PvpRadarNotice);
+
+        var outsidePvp = config.PvpRadarOutsidePvp;
+        if (ImGui.Checkbox(Resources.PvpRadarOutsidePvp, ref outsidePvp))
+        {
+            config.PvpRadarOutsidePvp = outsidePvp;
+            config.Save();
+        }
+
+        var onlyDot = config.PvpRadarOnlyDot;
+        if (ImGui.Checkbox(Resources.PvpRadarOnlyDot, ref onlyDot))
+        {
+            config.PvpRadarOnlyDot = onlyDot;
+            config.Save();
+        }
+
+        var hideFriendly = config.PvpRadarHideFriendly;
+        if (ImGui.Checkbox(Resources.PvpRadarHideFriendly, ref hideFriendly))
+        {
+            config.PvpRadarHideFriendly = hideFriendly;
+            config.Save();
+        }
+
+        var dotRadius = config.PvpRadarDotRadius;
+        if (ImGui.SliderFloat(Resources.PvpRadarDotRadius, ref dotRadius, 1f, 20f))
+        {
+            config.PvpRadarDotRadius = dotRadius;
+        }
+        if (ImGui.IsItemDeactivatedAfterEdit())
+        {
+            config.Save();
+        }
+
+        var enemyColor = ImGui.ColorConvertU32ToFloat4(config.PvpRadarEnemyColor);
+        if (ImGui.ColorEdit4(Resources.PvpRadarEnemyColor, ref enemyColor, ImGuiColorEditFlags.NoAlpha))
+        {
+            config.PvpRadarEnemyColor = ImGui.ColorConvertFloat4ToU32(enemyColor);
+        }
+        if (ImGui.IsItemDeactivatedAfterEdit())
+        {
+            config.Save();
+        }
+
+        var friendlyColor = ImGui.ColorConvertU32ToFloat4(config.PvpRadarFriendlyColor);
+        if (ImGui.ColorEdit4(Resources.PvpRadarFriendlyColor, ref friendlyColor, ImGuiColorEditFlags.NoAlpha))
+        {
+            config.PvpRadarFriendlyColor = ImGui.ColorConvertFloat4ToU32(friendlyColor);
+        }
+        if (ImGui.IsItemDeactivatedAfterEdit())
+        {
+            config.Save();
+        }
+
+        ImGui.Separator();
     }
 }

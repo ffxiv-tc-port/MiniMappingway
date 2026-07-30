@@ -140,4 +140,31 @@
 	<data name="ShowBorder" xml:space="preserve">
 		<value>Show Border</value>
 	</data>
+	<data name="PvpRadarDotRadius" xml:space="preserve">
+		<value>Dot radius</value>
+	</data>
+	<data name="PvpRadarEnabled" xml:space="preserve">
+		<value>Enable PvP player radar (on-screen dots)</value>
+	</data>
+	<data name="PvpRadarEnemyColor" xml:space="preserve">
+		<value>Enemy colour</value>
+	</data>
+	<data name="PvpRadarFriendlyColor" xml:space="preserve">
+		<value>Friendly colour</value>
+	</data>
+	<data name="PvpRadarHeader" xml:space="preserve">
+		<value>PvP Player Radar</value>
+	</data>
+	<data name="PvpRadarHideFriendly" xml:space="preserve">
+		<value>Hide friendly players</value>
+	</data>
+	<data name="PvpRadarNotice" xml:space="preserve">
+		<value>Projects nearby players onto the screen. Intended for Frontline and other PvP areas.</value>
+	</data>
+	<data name="PvpRadarOnlyDot" xml:space="preserve">
+		<value>Only show dots (no player names)</value>
+	</data>
+	<data name="PvpRadarOutsidePvp" xml:space="preserve">
+		<value>Also show outside PvP areas</value>
+	</data>
 </root>
