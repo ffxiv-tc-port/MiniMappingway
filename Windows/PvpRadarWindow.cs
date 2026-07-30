@@ -67,6 +67,11 @@ internal class PvpRadarWindow : Window
             return;
         }
 
+        // 紛爭前線是三方陣營戰:以遊戲自身的敵我判定欄位 CharacterData.Battalion
+        // (CS 註解:used for determining friend/enemy state)歸隊上色。
+        var inPvp = ServiceManager.ClientState.IsPvPExcludingDen;
+        var localBattalion = GetBattalion(local);
+
         foreach (var obj in ServiceManager.ObjectTable)
         {
             if (obj is not IPlayerCharacter pc)
@@ -82,8 +87,32 @@ internal class PvpRadarWindow : Window
                 continue;
             }
 
-            var hostile = pc.StatusFlags.HasFlag(StatusFlags.Hostile);
-            if (!hostile && config.PvpRadarHideFriendly)
+            var battalion = GetBattalion(pc);
+            bool friendly;
+            uint color;
+
+            if (inPvp && localBattalion is >= 0 and <= 2 && battalion is >= 0 and <= 2)
+            {
+                // 三方陣營模式:自己那隊=友方色,其餘兩隊各自陣營色
+                friendly = battalion == localBattalion;
+                color = friendly
+                    ? config.PvpRadarFriendlyColor
+                    : battalion switch
+                    {
+                        0 => config.PvpRadarTeamMaelstromColor,
+                        1 => config.PvpRadarTeamAdderColor,
+                        _ => config.PvpRadarTeamFlamesColor,
+                    };
+            }
+            else
+            {
+                // 拿不到陣營資料(或非 PvP 區):退回敵對/友方二分
+                var hostile = pc.StatusFlags.HasFlag(StatusFlags.Hostile);
+                friendly = !hostile;
+                color = hostile ? config.PvpRadarEnemyColor : config.PvpRadarFriendlyColor;
+            }
+
+            if (friendly && config.PvpRadarHideFriendly)
             {
                 continue;
             }
@@ -94,7 +123,6 @@ internal class PvpRadarWindow : Window
                 continue;
             }
 
-            var color = hostile ? config.PvpRadarEnemyColor : config.PvpRadarFriendlyColor;
             drawList.AddCircleFilled(screenPos, config.PvpRadarDotRadius, color);
             drawList.AddCircle(screenPos, config.PvpRadarDotRadius, 0xFF000000, 0, 1.5f);
 
@@ -111,5 +139,20 @@ internal class PvpRadarWindow : Window
                 drawList.AddText(textPos, color, name);
             }
         }
+    }
+
+    /// <summary>
+    /// 讀取 CS CharacterData.Battalion(遊戲用來判定敵我/隊伍歸屬的欄位)。
+    /// 讀不到時回傳 -1,呼叫端退回敵對/友方二分。
+    /// </summary>
+    private static unsafe int GetBattalion(Dalamud.Game.ClientState.Objects.Types.IGameObject obj)
+    {
+        var ch = (FFXIVClientStructs.FFXIV.Client.Game.Character.Character*)obj.Address;
+        if (ch == null)
+        {
+            return -1;
+        }
+
+        return ch->CharacterData.Battalion;
     }
 }

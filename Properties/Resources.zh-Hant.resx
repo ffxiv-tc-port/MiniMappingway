@@ -108,4 +108,7 @@
 	<data name="PvpRadarOutsidePvp" xml:space="preserve">
 		<value>非 PvP 區域也顯示</value>
 	</data>
+	<data name="PvpRadarTeamColorsNote" xml:space="preserve">
+		<value>紛爭前線三方陣營顏色（依 Battalion 歸隊；自己那隊使用友方顏色）：</value>
+	</data>
 </root>

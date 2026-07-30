@@ -32,9 +32,18 @@ public class Configuration : IPluginConfiguration
     public float PvpRadarDotRadius { get; set; } = 5f;
 
     // ImGui U32 色彩(ABGR)。敵對:紅;友方:藍。
+    // (敵對色同時是 Battalion 陣營無法判定時的退回色)
     public uint PvpRadarEnemyColor { get; set; } = 0xFF3030DC;
 
     public uint PvpRadarFriendlyColor { get; set; } = 0xFFDC641E;
+
+    // 紛爭前線三方陣營色(依 CharacterData.Battalion 歸屬上色;自己那隊一律用友方色)。
+    // 預設代表色:黑渦團=紅、雙蛇黨=黃、恆輝隊=橙。
+    public uint PvpRadarTeamMaelstromColor { get; set; } = 0xFF3030DC;
+
+    public uint PvpRadarTeamAdderColor { get; set; } = 0xFF1EC8E6;
+
+    public uint PvpRadarTeamFlamesColor { get; set; } = 0xFF1E8CF0;
 
     public void Initialize()
     {

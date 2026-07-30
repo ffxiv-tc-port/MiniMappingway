@@ -238,6 +238,45 @@ public class SettingsWindow : Window
             config.Save();
         }
 
+        // 紛爭前線三方陣營色(標籤走 Lumina GrandCompany sheet,台服自動顯示繁中)
+        ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1), Resources.PvpRadarTeamColorsNote);
+
+        var teamMael = ImGui.ColorConvertU32ToFloat4(config.PvpRadarTeamMaelstromColor);
+        if (ImGui.ColorEdit4($"{GetGrandCompanyName(1)}##teamMael", ref teamMael, ImGuiColorEditFlags.NoAlpha))
+        {
+            config.PvpRadarTeamMaelstromColor = ImGui.ColorConvertFloat4ToU32(teamMael);
+        }
+        if (ImGui.IsItemDeactivatedAfterEdit())
+        {
+            config.Save();
+        }
+
+        var teamAdder = ImGui.ColorConvertU32ToFloat4(config.PvpRadarTeamAdderColor);
+        if (ImGui.ColorEdit4($"{GetGrandCompanyName(2)}##teamAdder", ref teamAdder, ImGuiColorEditFlags.NoAlpha))
+        {
+            config.PvpRadarTeamAdderColor = ImGui.ColorConvertFloat4ToU32(teamAdder);
+        }
+        if (ImGui.IsItemDeactivatedAfterEdit())
+        {
+            config.Save();
+        }
+
+        var teamFlames = ImGui.ColorConvertU32ToFloat4(config.PvpRadarTeamFlamesColor);
+        if (ImGui.ColorEdit4($"{GetGrandCompanyName(3)}##teamFlames", ref teamFlames, ImGuiColorEditFlags.NoAlpha))
+        {
+            config.PvpRadarTeamFlamesColor = ImGui.ColorConvertFloat4ToU32(teamFlames);
+        }
+        if (ImGui.IsItemDeactivatedAfterEdit())
+        {
+            config.Save();
+        }
+
         ImGui.Separator();
+    }
+
+    private static string GetGrandCompanyName(uint rowId)
+    {
+        var name = ServiceManager.DataManager.GetExcelSheet<Lumina.Excel.Sheets.GrandCompany>().GetRowOrDefault(rowId)?.Name.ExtractText();
+        return string.IsNullOrEmpty(name) ? $"Team {rowId}" : name;
     }
 }

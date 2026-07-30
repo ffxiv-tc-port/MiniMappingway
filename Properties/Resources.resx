@@ -167,4 +167,7 @@
 	<data name="PvpRadarOutsidePvp" xml:space="preserve">
 		<value>Also show outside PvP areas</value>
 	</data>
+	<data name="PvpRadarTeamColorsNote" xml:space="preserve">
+		<value>Frontline team colours (by battalion; your own team uses the friendly colour):</value>
+	</data>
 </root>

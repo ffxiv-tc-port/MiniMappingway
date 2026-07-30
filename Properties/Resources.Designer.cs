@@ -250,6 +250,15 @@ namespace MiniMappingway.Properties {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Frontline team colours (by battalion; your own team uses the friendly colour):.
+        /// </summary>
+        internal static string PvpRadarTeamColorsNote {
+            get {
+                return ResourceManager.GetString("PvpRadarTeamColorsNote", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Mini-Mappingway Settings.
         /// </summary>
         internal static string SettingsWindowTitle {
