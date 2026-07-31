@@ -26,10 +26,19 @@ internal static class MarkerUtility
 
     private static unsafe CircleData? CalculateCirclePosition(this KeyValuePair<int, PersonDetails> person)
     {
-        var personObj = ServiceManager.ObjectTable.CreateObjectReference(person.Value.Ptr);
+        // ⚠️ 不要拿 PersonDetails.Ptr(建立時存下的原始指標)去解參考。
+        // 那個位址是當初記錄的,物件表的 slot 之後可能被別人重用或釋放;
+        // CreateObjectReference(舊指標) 只是把它包起來,之後每次讀屬性都是在
+        // 解參考一根可能已經死掉的指標 → 攔不到的 AccessViolation
+        // (corrupted-state exception,try/catch 無效)。
+        // 原本的守衛也不成立:ObjectTable[person.Key] != null 只說明那個索引
+        // 「有東西」,不代表還是同一個人;而名稱比對排在解參考之後。
+        // 正解:每次都從物件表以索引重查,並用 Address 比對確認 slot 沒被換人,
+        // 之後所有解參考都走這次重查到的位址。
+        var personObj = ServiceManager.ObjectTable[person.Key];
 
-        if (personObj == null || !personObj.IsValid() || ServiceManager.ObjectTable[person.Key] == null
-            || (byte)((Character*)person.Value.Ptr)->GameObject.ObjectKind != (byte)ObjectKind.Player)
+        if (personObj == null || personObj.Address != person.Value.Ptr
+            || (byte)((Character*)personObj.Address)->GameObject.ObjectKind != (byte)ObjectKind.Player)
         {
             ServiceManager.NaviMapManager.RemoveFromBag(person.Value.Id, person.Value.SourceName);
             return null;

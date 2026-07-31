@@ -65,30 +65,37 @@ public sealed class FinderService : IDisposable
                 continue;
             }
 
-            if (ServiceManager.ObjectTable[i] == null)
+            // ⚠️ 每次都從物件表重查,不要解參考 PersonDetails.Ptr。
+            // Ptr 是這個人被記錄「當下」的原始位址;之後 slot 可能被釋放或換人,
+            // 而原本的守衛(ObjectTable[i] != null)只說明該索引有東西、
+            // 不代表還是同一個人,名稱比對又排在解參考之後。
+            // 下面的 try/catch 也不是防護:AccessViolationException 在 .NET Core
+            // 是 corrupted-state exception,catch 不到。
+            var current = ServiceManager.ObjectTable[i];
+            if (current == null)
             {
                 continue;
             }
-            var ptr = person.Ptr;
+
+            // 位址不符代表這個 slot 已經換人,原本記錄的位址不可再解參考。
+            if (current.Address != person.Ptr)
+            {
+                ServiceManager.NaviMapManager.RemoveFromBag(person.Id, dict.Key);
+                continue;
+            }
+
             unsafe
             {
-                try
-                {
-                    var charPointer = (Character*)ptr;
-                    if ((byte)charPointer->GameObject.ObjectKind != (byte)ObjectKind.Player)
-                    {
-                        ServiceManager.NaviMapManager.RemoveFromBag(person.Id, dict.Key);
-                        continue;
-                    }
-                }
-                catch(Exception)
+                // 走這次重查到的位址(本幀剛從物件表解析出來,確定是活的)。
+                var charPointer = (Character*)current.Address;
+                if ((byte)charPointer->GameObject.ObjectKind != (byte)ObjectKind.Player)
                 {
                     ServiceManager.NaviMapManager.RemoveFromBag(person.Id, dict.Key);
                     continue;
                 }
-
             }
-            if (ServiceManager.ObjectTable[i]?.Name.ToString() != person.Name)
+
+            if (current.Name.ToString() != person.Name)
             {
                 ServiceManager.NaviMapManager.RemoveFromBag(person.Id, dict.Key);
             }
