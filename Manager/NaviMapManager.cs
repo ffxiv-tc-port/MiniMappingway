@@ -122,44 +122,106 @@ public unsafe class NaviMapManager : IDisposable
 
     public bool UpdateNaviMap()
     {
+        // 原生指標只在這次呼叫內使用,不存進欄位跨幀保留;每次呼叫都重新從 GameGui 解析。
+        var naviMap = NaviMapPointer;
 
-        if (NaviMapPointer == null)
+        if (naviMap == null)
         {
             return false;
         }
 
-        //There's probably a better way of doing this but I don't know it for now
-        IsLocked = ((AtkComponentCheckBox*)NaviMapPointer->GetNodeById(4)->GetComponent())->IsChecked;
-
-        if (NaviMapPointer->UldManager.LoadedState != AtkLoadState.Loaded)
+        // UldManager 尚未載入完成時 NodeList / NodeListCount 可能未初始化或已失效,
+        // 此時呼叫 GetNodeById 會走到無效節點。所有節點存取都必須排在這個檢查之後。
+        if (naviMap->UldManager.LoadedState != AtkLoadState.Loaded)
         {
             return false;
         }
-        try
+
+        // 以下每一跳都做 null 與型別檢查,任何一跳失敗就保留前一次的值(fail-closed)。
+        // 刻意不使用 try/catch:懸空指標造成的 AccessViolationException 在 .NET Core 屬於
+        // corrupted-state exception,try/catch 完全攔不到,加了只會製造假的安全感。
+
+        // 地圖鎖定核取方塊。
+        var lockComponent = GetComponentOfNode(naviMap->GetNodeById(4));
+        if (IsButtonDerivedComponent(lockComponent))
         {
-            Rotation = NaviMapPointer->GetNodeById(8)->Rotation;
-            Zoom = NaviMapPointer->GetNodeById(18)->GetComponent()->GetImageNodeById(6)->ScaleX;
-        }
-        catch
-        {
-            // ignored
+            IsLocked = ((AtkComponentCheckBox*)lockComponent)->IsChecked;
         }
 
-        X = NaviMapPointer->X;
-        Y = NaviMapPointer->Y;
-        NaviScale = NaviMapPointer->Scale;
-        Visible = (NaviMapPointer->IsVisible && NaviMapPointer->VisibilityFlags == 0);
+        var rotationNode = naviMap->GetNodeById(8);
+        if (rotationNode != null)
+        {
+            Rotation = rotationNode->Rotation;
+        }
+
+        var zoomComponent = GetComponentOfNode(naviMap->GetNodeById(18));
+        if (zoomComponent != null && zoomComponent->UldManager.LoadedState == AtkLoadState.Loaded)
+        {
+            var zoomImageNode = zoomComponent->GetImageNodeById(6);
+            if (zoomImageNode != null)
+            {
+                Zoom = zoomImageNode->ScaleX;
+            }
+        }
+
+        X = naviMap->X;
+        Y = naviMap->Y;
+        NaviScale = naviMap->Scale;
+        Visible = naviMap->IsVisible && naviMap->VisibilityFlags == 0;
 
         return true;
     }
 
+    /// <summary>
+    /// 取出 component 節點所掛的元件;節點為 null 或不是 component 節點時回傳 null。
+    /// AtkResNode 的結構大小是 0xB0,而 AtkComponentNode.Component 位在 0xB0,
+    /// 少了 Type 檢查就會讀到配置範圍外的記憶體。CS 對 component 節點的 Type 一律 >= 1000。
+    /// </summary>
+    private static AtkComponentBase* GetComponentOfNode(AtkResNode* node)
+    {
+        if (node == null || (int)node->Type < 1000)
+        {
+            return null;
+        }
+
+        return ((AtkComponentNode*)node)->Component;
+    }
+
+    /// <summary>
+    /// 元件是不是 AtkComponentButton 衍生型別(結構大小 0xF0)。
+    /// IsChecked 讀的是 AtkComponentButton.Flags(位於 0xE8),已經超出 AtkComponentBase
+    /// (0xC0)的範圍,所以必須先確認元件型別才可以讀。元件型別取自 uld 的
+    /// AtkUldComponentInfo,全程只走已定義的結構欄位,不對任意位址做探測。
+    /// </summary>
+    private static bool IsButtonDerivedComponent(AtkComponentBase* component)
+    {
+        if (component == null || component->UldManager.BaseType != AtkUldManagerBaseType.Component)
+        {
+            return false;
+        }
+
+        var info = (AtkUldComponentInfo*)component->UldManager.Objects;
+        if (info == null)
+        {
+            return false;
+        }
+
+        return info->ComponentType is ComponentType.Button
+                                   or ComponentType.CheckBox
+                                   or ComponentType.RadioButton
+                                   or ComponentType.ListItemRenderer
+                                   or ComponentType.HoldButton;
+    }
+
     public bool CheckIfLoading()
     {
+        // addon 沒開時 GetAddonByName 回傳 0,原本的寫法會直接對空指標解參考。
+        // 這兩個 addon 都只在切換區域時才存在,不存在即代表沒有在讀取。
         var locationTitle = (AtkUnitBase*)ServiceManager.GameGui.GetAddonByName("_LocationTitle").Address;
         var fadeMiddle = (AtkUnitBase*)ServiceManager.GameGui.GetAddonByName("FadeMiddle").Address;
-        return Loading =
-            locationTitle->IsVisible ||
-            fadeMiddle->IsVisible;
+
+        return Loading = (locationTitle != null && locationTitle->IsVisible)
+                         || (fadeMiddle != null && fadeMiddle->IsVisible);
     }
 
     public void UpdateMap()
