@@ -68,6 +68,24 @@ internal class PvpRadarWindow : Window
 
     private readonly List<RadarEntry> _entries = new(64);
 
+    // 🔴 效能：「誰在鎖定我」不需要每幀重算。前線最多 72 人，每幀對每個人做多層結構
+    // 解參考（Character->LookAt.Controller.Params[0]）在高幀率下是每秒近萬次，實機回報會影響
+    // 遊戲流暢度。目標關係以人類反應時間變化，節流到 TargetingScanIntervalMs 完全夠用；
+    // 位置與畫點仍然每幀更新，所以點不會延遲、只有「線」的歸屬最多慢一個間隔。
+    private const int TargetingScanIntervalMs = 200;
+
+    private long _nextTargetingScanTick;
+
+    private readonly Dictionary<ulong, TargetingMe> _targetingCache = new(64);
+
+    private int _cachedScanned;
+
+    private int _cachedConfirmed;
+
+    private int _cachedGaze;
+
+    private int _cachedZeroHard;
+
     private DateTime _lastTargetingDiag = DateTime.MinValue;
 
     public PvpRadarWindow() : base("MMWPvpRadar")
@@ -138,10 +156,19 @@ internal class PvpRadarWindow : Window
             drawTargetingLines = true;
         }
 
-        var scannedPlayers = 0;
-        var confirmedCount = 0;
-        var gazeCount = 0;
-        var zeroHardTarget = 0;
+        // 目標關係節流：時間到才真的重掃，否則沿用上一次的快取（見欄位處的說明）。
+        var now = Environment.TickCount64;
+        var rescanTargeting = config.PvpRadarShowTargetingMeLines && now >= _nextTargetingScanTick;
+        if (rescanTargeting)
+        {
+            _nextTargetingScanTick = now + TargetingScanIntervalMs;
+            _targetingCache.Clear();
+            _cachedScanned = 0;
+            _cachedConfirmed = 0;
+            _cachedGaze = 0;
+            _cachedZeroHard = 0;
+        }
+
 
         _entries.Clear();
 
@@ -165,23 +192,33 @@ internal class PvpRadarWindow : Window
             var targeting = TargetingMe.No;
             if (config.PvpRadarShowTargetingMeLines)
             {
-                scannedPlayers++;
-                ReadTargetIds(pc, out var hardTargetId, out var gazeTargetId);
+                if (rescanTargeting)
+                {
+                    _cachedScanned++;
+                    ReadTargetIds(pc, out var hardTargetId, out var gazeTargetId);
 
-                if (hardTargetId == 0)
-                {
-                    zeroHardTarget++;
-                }
+                    if (hardTargetId == 0)
+                    {
+                        _cachedZeroHard++;
+                    }
 
-                if (hardTargetId == localId)
-                {
-                    targeting = TargetingMe.Confirmed;
-                    confirmedCount++;
+                    if (hardTargetId == localId)
+                    {
+                        targeting = TargetingMe.Confirmed;
+                        _cachedConfirmed++;
+                    }
+                    else if (gazeTargetId == localId)
+                    {
+                        targeting = TargetingMe.Gaze;
+                        _cachedGaze++;
+                    }
+
+                    _targetingCache[pc.GameObjectId] = targeting;
                 }
-                else if (gazeTargetId == localId)
+                else if (!_targetingCache.TryGetValue(pc.GameObjectId, out targeting))
                 {
-                    targeting = TargetingMe.Gaze;
-                    gazeCount++;
+                    // 這一幀新出現、還沒被掃到的人：當「不知道」處理，不畫線。
+                    targeting = TargetingMe.No;
                 }
             }
 
@@ -256,14 +293,14 @@ internal class PvpRadarWindow : Window
 
         if (drawTargetingLines && config.PvpRadarTargetingMeShowCount)
         {
-            var known = confirmedCount + (config.PvpRadarTargetingMeIncludeGaze ? gazeCount : 0);
+            var known = _cachedConfirmed + (config.PvpRadarTargetingMeIncludeGaze ? _cachedGaze : 0);
             if (known > 0)
             {
                 DrawTargetingCount(drawList, config, localScreenPos, known);
             }
         }
 
-        LogTargetingDiagnostics(config, scannedPlayers, confirmedCount, gazeCount, zeroHardTarget);
+        LogTargetingDiagnostics(config, _cachedScanned, _cachedConfirmed, _cachedGaze, _cachedZeroHard);
     }
 
     /// <summary>
