@@ -250,6 +250,69 @@ namespace MiniMappingway.Properties {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Show lines from players who target you.
+        /// </summary>
+        internal static string PvpRadarShowTargetingMeLines {
+            get {
+                return ResourceManager.GetString("PvpRadarShowTargetingMeLines", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}+ targeting you.
+        /// </summary>
+        internal static string PvpRadarTargetingMeCount {
+            get {
+                return ResourceManager.GetString("PvpRadarTargetingMeCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Also show unconfirmed lines (gaze target only).
+        /// </summary>
+        internal static string PvpRadarTargetingMeIncludeGaze {
+            get {
+                return ResourceManager.GetString("PvpRadarTargetingMeIncludeGaze", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Targeting line colour.
+        /// </summary>
+        internal static string PvpRadarTargetingMeLineColor {
+            get {
+                return ResourceManager.GetString("PvpRadarTargetingMeLineColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Targeting line thickness.
+        /// </summary>
+        internal static string PvpRadarTargetingMeLineThickness {
+            get {
+                return ResourceManager.GetString("PvpRadarTargetingMeLineThickness", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Draws a line from every player who has you targeted. Only players the client actually receives can be checked, so the count is a lower bound (shown with a +), and nobody who cannot be projected onto the screen (for example behind you) gets a line..
+        /// </summary>
+        internal static string PvpRadarTargetingMeNotice {
+            get {
+                return ResourceManager.GetString("PvpRadarTargetingMeNotice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show how many players have you targeted.
+        /// </summary>
+        internal static string PvpRadarTargetingMeShowCount {
+            get {
+                return ResourceManager.GetString("PvpRadarTargetingMeShowCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Frontline team colours (by battalion; your own team uses the friendly colour):.
         /// </summary>
         internal static string PvpRadarTeamColorsNote {

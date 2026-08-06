@@ -45,6 +45,24 @@ public class Configuration : IPluginConfiguration
 
     public uint PvpRadarTeamFlamesColor { get; set; } = 0xFF1E8CF0;
 
+    // --- 「把我選定為目標」的連線層(疊在上面的 PvP 玩家雷達之上) ---
+    // 預設關,開啟後從每個把我選定為目標的玩家畫一條線到自己。
+    public bool PvpRadarShowTargetingMeLines { get; set; } = false;
+
+    // 同時顯示「未確認」的連線:對方的注視(LookAt)目標是我,但硬目標欄位不是。
+    // 預設開,因為硬目標欄位若在台服拿不到資料,這是唯一還看得到東西的來源。
+    public bool PvpRadarTargetingMeIncludeGaze { get; set; } = true;
+
+    // 在自己身上顯示「有幾個人以我為目標」。數字帶 "+",因為那是下限不是總數。
+    public bool PvpRadarTargetingMeShowCount { get; set; } = true;
+
+    // 連線粗細(未確認的連線會自動畫細一點)。
+    public float PvpRadarTargetingMeLineThickness { get; set; } = 2f;
+
+    // ImGui U32 色彩(ABGR)。橙黃,和三方陣營色都拉開。
+    // 未確認的連線用同一個 RGB、alpha 自動降低,不另外開一個顏色設定。
+    public uint PvpRadarTargetingMeLineColor { get; set; } = 0xFF20D0FF;
+
     public void Initialize()
     {
 

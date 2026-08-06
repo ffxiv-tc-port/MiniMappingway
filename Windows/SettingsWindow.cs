@@ -272,6 +272,60 @@ public class SettingsWindow : Window
         }
 
         ImGui.Separator();
+
+        DrawTargetingMeSettings(config);
+
+        ImGui.Separator();
+    }
+
+    /// <summary>
+    /// 「把我選定為目標」連線層的設定。整組預設關,開啟前的行為與原本完全一樣。
+    /// </summary>
+    private static void DrawTargetingMeSettings(Configuration config)
+    {
+        var showTargetingLines = config.PvpRadarShowTargetingMeLines;
+        if (ImGui.Checkbox(Resources.PvpRadarShowTargetingMeLines, ref showTargetingLines))
+        {
+            config.PvpRadarShowTargetingMeLines = showTargetingLines;
+            config.Save();
+        }
+
+        // 這段講的是「這個顯示看不到什麼」,屬於隨時要看得見的限制,不藏進 tooltip。
+        ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1), Resources.PvpRadarTargetingMeNotice);
+
+        var includeGaze = config.PvpRadarTargetingMeIncludeGaze;
+        if (ImGui.Checkbox(Resources.PvpRadarTargetingMeIncludeGaze, ref includeGaze))
+        {
+            config.PvpRadarTargetingMeIncludeGaze = includeGaze;
+            config.Save();
+        }
+
+        var showCount = config.PvpRadarTargetingMeShowCount;
+        if (ImGui.Checkbox(Resources.PvpRadarTargetingMeShowCount, ref showCount))
+        {
+            config.PvpRadarTargetingMeShowCount = showCount;
+            config.Save();
+        }
+
+        var lineThickness = config.PvpRadarTargetingMeLineThickness;
+        if (ImGui.SliderFloat(Resources.PvpRadarTargetingMeLineThickness, ref lineThickness, 1f, 8f))
+        {
+            config.PvpRadarTargetingMeLineThickness = lineThickness;
+        }
+        if (ImGui.IsItemDeactivatedAfterEdit())
+        {
+            config.Save();
+        }
+
+        var targetingColor = ImGui.ColorConvertU32ToFloat4(config.PvpRadarTargetingMeLineColor);
+        if (ImGui.ColorEdit4(Resources.PvpRadarTargetingMeLineColor, ref targetingColor, ImGuiColorEditFlags.NoAlpha))
+        {
+            config.PvpRadarTargetingMeLineColor = ImGui.ColorConvertFloat4ToU32(targetingColor);
+        }
+        if (ImGui.IsItemDeactivatedAfterEdit())
+        {
+            config.Save();
+        }
     }
 
     private static string GetGrandCompanyName(uint rowId)
