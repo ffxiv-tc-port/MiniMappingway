@@ -230,7 +230,18 @@ public unsafe class NaviMapManager : IDisposable
         {
             try
             {
-                var map = _maps.GetRow(GetMapId());
+                var mapId = GetMapId();
+                // GetMapId() 取不到 AgentMap 時回 0。Map 第 0 列是佔位列,拿它算出來的
+                // ZoneScale／Offset 會是錯的且完全靜默 —— 寧可保留上一次的值,下一次
+                // TerritoryChanged 會再更新一次。
+                if (mapId == 0)
+                {
+                    ServiceManager.Log.Information(
+                        "[MiniMappingway] AgentMap 尚未就緒,這次不更新地圖比例與位移。");
+                    return;
+                }
+
+                var map = _maps.GetRow(mapId);
 
                 if (map.SizeFactor != 0)
                 {
@@ -250,9 +261,32 @@ public unsafe class NaviMapManager : IDisposable
         }
     }
 
+    /// <summary>
+    /// 取得目前地圖編號;取不到 <c>AgentMap</c> 時回 0(呼叫端必須把 0 當成「不知道」處理)。
+    /// </summary>
+    /// <remarks>
+    /// 🔴 <c>AgentMap.Instance()</c> 由 <c>[Agent(AgentId.Map)]</c> 產生:內部鏈
+    /// AgentModule → UIModule → Framework,任一層回 null 整條就回 null(登入前、切場景、
+    /// 登出後都是常態),而底層 <c>[StaticAddress]</c>／<c>[MemberFunction]</c> 特徵碼失配時
+    /// 改為擲 <c>InvalidOperationException</c>——兩種失效模式並存,只擋一種等於假防護。
+    /// 裸解參考 null 原生指標是 AccessViolationException,在 .NET Core 屬 corrupted-state
+    /// exception,<c>try/catch</c> 完全攔不到 ⇒ 只能事前判空。
+    /// ⚠️ 這條路徑其中一個呼叫端是 <c>NaviMapManager</c> 的建構子,也就是外掛載入的當下 ——
+    /// 在標題畫面載入外掛時 AgentMap 必定還不存在,那是最容易踩到的情境。
+    /// </remarks>
     private uint GetMapId()
     {
-        return AgentMap.Instance()->CurrentMapId;
+        AgentMap* agent;
+        try
+        {
+            agent = AgentMap.Instance();
+        }
+        catch
+        {
+            return 0;
+        }
+
+        return agent == null ? 0u : agent->CurrentMapId;
     }
 
     public bool ClearPersonBag(string sourceName)
