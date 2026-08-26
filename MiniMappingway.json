@@ -5,6 +5,7 @@
   "Description": "在小地圖上顯示好友與公會成員的插件。可在設定中自訂標記樣式，並切換是否顯示好友、公會成員或兩者！圖示由 twitter 上的 @Miendoodle 繪製。感謝 nya 提供的點子！",
   "InternalName": "MiniMappingway",
   "ApplicableVersion": "any",
+  "DalamudApiLevel": 13,
   "Tags": [
     "friends",
     "minimap",

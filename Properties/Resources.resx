@@ -140,4 +140,55 @@
 	<data name="ShowBorder" xml:space="preserve">
 		<value>Show Border</value>
 	</data>
+	<data name="PvpRadarDotRadius" xml:space="preserve">
+		<value>Dot radius</value>
+	</data>
+	<data name="PvpRadarEnabled" xml:space="preserve">
+		<value>Enable PvP player radar (on-screen dots)</value>
+	</data>
+	<data name="PvpRadarEnemyColor" xml:space="preserve">
+		<value>Enemy colour</value>
+	</data>
+	<data name="PvpRadarFriendlyColor" xml:space="preserve">
+		<value>Friendly colour</value>
+	</data>
+	<data name="PvpRadarHeader" xml:space="preserve">
+		<value>PvP Player Radar</value>
+	</data>
+	<data name="PvpRadarHideFriendly" xml:space="preserve">
+		<value>Hide friendly players</value>
+	</data>
+	<data name="PvpRadarNotice" xml:space="preserve">
+		<value>Projects nearby players onto the screen. Intended for Frontline and other PvP areas.</value>
+	</data>
+	<data name="PvpRadarOnlyDot" xml:space="preserve">
+		<value>Only show dots (no player names)</value>
+	</data>
+	<data name="PvpRadarOutsidePvp" xml:space="preserve">
+		<value>Also show outside PvP areas</value>
+	</data>
+	<data name="PvpRadarShowTargetingMeLines" xml:space="preserve">
+		<value>Show lines from players who target you</value>
+	</data>
+	<data name="PvpRadarTargetingMeCount" xml:space="preserve">
+		<value>{0}+ targeting you</value>
+	</data>
+	<data name="PvpRadarTargetingMeIncludeGaze" xml:space="preserve">
+		<value>Also show unconfirmed lines (gaze target only)</value>
+	</data>
+	<data name="PvpRadarTargetingMeLineColor" xml:space="preserve">
+		<value>Targeting line colour</value>
+	</data>
+	<data name="PvpRadarTargetingMeLineThickness" xml:space="preserve">
+		<value>Targeting line thickness</value>
+	</data>
+	<data name="PvpRadarTargetingMeNotice" xml:space="preserve">
+		<value>Draws a line from every player who has you targeted. Only players the client actually receives can be checked, so the count is a lower bound (shown with a +), and nobody who cannot be projected onto the screen (for example behind you) gets a line.</value>
+	</data>
+	<data name="PvpRadarTargetingMeShowCount" xml:space="preserve">
+		<value>Show how many players have you targeted</value>
+	</data>
+	<data name="PvpRadarTeamColorsNote" xml:space="preserve">
+		<value>Frontline team colours (by battalion; your own team uses the friendly colour):</value>
+	</data>
 </root>

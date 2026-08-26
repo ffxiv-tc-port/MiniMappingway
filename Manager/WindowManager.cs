@@ -7,6 +7,7 @@ public class WindowManager : IDisposable
 {
 
     internal readonly NaviMapWindow NaviMapWindow = new();
+    internal readonly PvpRadarWindow PvpRadarWindow = new();
     internal readonly SettingsWindow SettingsWindow = new();
 
     public void AddWindowsToWindowSystem()
@@ -14,6 +15,7 @@ public class WindowManager : IDisposable
         ServiceManager.Log.Verbose("Adding Windows To Window System");
 
         ServiceManager.WindowSystem.AddWindow(NaviMapWindow);
+        ServiceManager.WindowSystem.AddWindow(PvpRadarWindow);
         ServiceManager.WindowSystem.AddWindow(SettingsWindow);
     }
 

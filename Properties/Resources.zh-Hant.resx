@@ -64,7 +64,7 @@
 		<value>目前是透過比對公會標籤來尋找公會成員。</value>
 	</data>
 	<data name="MarkerColourDescription" xml:space="preserve">
-		<value>標記顏色。點擊色塊可開啟選色器。</value>
+		<value>標記顏色。點選色塊可開啟選色器。</value>
 	</data>
 	<data name="MarkerSettingsHeader" xml:space="preserve">
 		<value>標記設定（依優先度排序）：</value>
@@ -80,5 +80,56 @@
 	</data>
 	<data name="ShowBorder" xml:space="preserve">
 		<value>顯示邊框</value>
+	</data>
+	<data name="PvpRadarDotRadius" xml:space="preserve">
+		<value>點半徑</value>
+	</data>
+	<data name="PvpRadarEnabled" xml:space="preserve">
+		<value>啟用 PvP 玩家雷達（螢幕標點）</value>
+	</data>
+	<data name="PvpRadarEnemyColor" xml:space="preserve">
+		<value>敵對顏色</value>
+	</data>
+	<data name="PvpRadarFriendlyColor" xml:space="preserve">
+		<value>友方顏色</value>
+	</data>
+	<data name="PvpRadarHeader" xml:space="preserve">
+		<value>PvP 玩家雷達</value>
+	</data>
+	<data name="PvpRadarHideFriendly" xml:space="preserve">
+		<value>不顯示友方玩家</value>
+	</data>
+	<data name="PvpRadarNotice" xml:space="preserve">
+		<value>將可接收到的周圍玩家投影為螢幕標點，主要用於紛爭前線等 PvP 區域。</value>
+	</data>
+	<data name="PvpRadarOnlyDot" xml:space="preserve">
+		<value>僅顯示判定點（不顯示玩家名稱）</value>
+	</data>
+	<data name="PvpRadarOutsidePvp" xml:space="preserve">
+		<value>非 PvP 區域也顯示</value>
+	</data>
+	<data name="PvpRadarShowTargetingMeLines" xml:space="preserve">
+		<value>顯示「將我選定為目標」的連線</value>
+	</data>
+	<data name="PvpRadarTargetingMeCount" xml:space="preserve">
+		<value>{0}+ 人以我為目標</value>
+	</data>
+	<data name="PvpRadarTargetingMeIncludeGaze" xml:space="preserve">
+		<value>同時顯示未確認的連線（僅注視目標）</value>
+	</data>
+	<data name="PvpRadarTargetingMeLineColor" xml:space="preserve">
+		<value>目標連線顏色</value>
+	</data>
+	<data name="PvpRadarTargetingMeLineThickness" xml:space="preserve">
+		<value>目標連線粗細</value>
+	</data>
+	<data name="PvpRadarTargetingMeNotice" xml:space="preserve">
+		<value>從每個把我選定為目標的玩家畫一條線到自己。只檢查得到客戶端實際收得到的對象，所以人數是下限（以 + 標示）；投影不到畫面上的人（例如在身後）不會畫線。</value>
+	</data>
+	<data name="PvpRadarTargetingMeShowCount" xml:space="preserve">
+		<value>顯示以我為目標的人數</value>
+	</data>
+	<data name="PvpRadarTeamColorsNote" xml:space="preserve">
+		<value>紛爭前線三方陣營顏色（依 Battalion 歸隊；自己那隊使用友方顏色）：</value>
 	</data>
 </root>

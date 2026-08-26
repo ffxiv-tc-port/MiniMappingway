@@ -169,6 +169,159 @@ namespace MiniMappingway.Properties {
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Dot radius.
+        /// </summary>
+        internal static string PvpRadarDotRadius {
+            get {
+                return ResourceManager.GetString("PvpRadarDotRadius", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enable PvP player radar (on-screen dots).
+        /// </summary>
+        internal static string PvpRadarEnabled {
+            get {
+                return ResourceManager.GetString("PvpRadarEnabled", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enemy colour.
+        /// </summary>
+        internal static string PvpRadarEnemyColor {
+            get {
+                return ResourceManager.GetString("PvpRadarEnemyColor", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Friendly colour.
+        /// </summary>
+        internal static string PvpRadarFriendlyColor {
+            get {
+                return ResourceManager.GetString("PvpRadarFriendlyColor", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to PvP Player Radar.
+        /// </summary>
+        internal static string PvpRadarHeader {
+            get {
+                return ResourceManager.GetString("PvpRadarHeader", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Hide friendly players.
+        /// </summary>
+        internal static string PvpRadarHideFriendly {
+            get {
+                return ResourceManager.GetString("PvpRadarHideFriendly", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Projects nearby players onto the screen. Intended for Frontline and other PvP areas..
+        /// </summary>
+        internal static string PvpRadarNotice {
+            get {
+                return ResourceManager.GetString("PvpRadarNotice", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Only show dots (no player names).
+        /// </summary>
+        internal static string PvpRadarOnlyDot {
+            get {
+                return ResourceManager.GetString("PvpRadarOnlyDot", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Also show outside PvP areas.
+        /// </summary>
+        internal static string PvpRadarOutsidePvp {
+            get {
+                return ResourceManager.GetString("PvpRadarOutsidePvp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Show lines from players who target you.
+        /// </summary>
+        internal static string PvpRadarShowTargetingMeLines {
+            get {
+                return ResourceManager.GetString("PvpRadarShowTargetingMeLines", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}+ targeting you.
+        /// </summary>
+        internal static string PvpRadarTargetingMeCount {
+            get {
+                return ResourceManager.GetString("PvpRadarTargetingMeCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Also show unconfirmed lines (gaze target only).
+        /// </summary>
+        internal static string PvpRadarTargetingMeIncludeGaze {
+            get {
+                return ResourceManager.GetString("PvpRadarTargetingMeIncludeGaze", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Targeting line colour.
+        /// </summary>
+        internal static string PvpRadarTargetingMeLineColor {
+            get {
+                return ResourceManager.GetString("PvpRadarTargetingMeLineColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Targeting line thickness.
+        /// </summary>
+        internal static string PvpRadarTargetingMeLineThickness {
+            get {
+                return ResourceManager.GetString("PvpRadarTargetingMeLineThickness", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Draws a line from every player who has you targeted. Only players the client actually receives can be checked, so the count is a lower bound (shown with a +), and nobody who cannot be projected onto the screen (for example behind you) gets a line..
+        /// </summary>
+        internal static string PvpRadarTargetingMeNotice {
+            get {
+                return ResourceManager.GetString("PvpRadarTargetingMeNotice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show how many players have you targeted.
+        /// </summary>
+        internal static string PvpRadarTargetingMeShowCount {
+            get {
+                return ResourceManager.GetString("PvpRadarTargetingMeShowCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Frontline team colours (by battalion; your own team uses the friendly colour):.
+        /// </summary>
+        internal static string PvpRadarTeamColorsNote {
+            get {
+                return ResourceManager.GetString("PvpRadarTeamColorsNote", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Mini-Mappingway Settings.
         /// </summary>
         internal static string SettingsWindowTitle {
