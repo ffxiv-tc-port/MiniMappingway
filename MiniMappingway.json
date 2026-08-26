@@ -1,8 +1,8 @@
 {
   "Author": "JayceOfSpades",
   "Name": "Mini-Mappingway",
-  "Punchline": "A plugin to show your friends and FC members on the minimap",
-  "Description": "A plugin to show your friends and FC members on the minimap. Customise the markers and toggle whether you want to see friends, FC members, or both, in the settings! Icon by @Miendoodle on twitter. Thanks nya for the idea!",
+  "Punchline": "在小地圖上顯示好友與公會成員的插件。",
+  "Description": "在小地圖上顯示好友與公會成員的插件。可在設定中自訂標記樣式，並切換是否顯示好友、公會成員或兩者！圖示由 twitter 上的 @Miendoodle 繪製。感謝 nya 提供的點子！",
   "InternalName": "MiniMappingway",
   "ApplicableVersion": "any",
   "Tags": [
@@ -13,5 +13,6 @@
     "FC",
     "mmway"
   ],
-  "RepoUrl": "https://github.com/jaycewhite/MiniMappingway"
+  "RepoUrl": "https://github.com/ffxiv-tc-port/MiniMappingway",
+  "IconUrl": "https://raw.githubusercontent.com/ffxiv-tc-port/DalamudPluginsTC/main/icons/MiniMappingway.png"
 }

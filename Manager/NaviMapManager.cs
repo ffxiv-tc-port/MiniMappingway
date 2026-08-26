@@ -1,6 +1,6 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Dalamud.Bindings.ImGui;
+using ImGuiNET;
 using Lumina.Excel;
 using Lumina.Excel.Sheets;
 using MiniMappingway.Model;
@@ -46,7 +46,7 @@ public unsafe class NaviMapManager : IDisposable
 
     public bool InCombat { get; set; }
 
-    private AtkUnitBase* NaviMapPointer => (AtkUnitBase*)ServiceManager.GameGui.GetAddonByName("_NaviMap").Address;
+    private AtkUnitBase* NaviMapPointer => (AtkUnitBase*)ServiceManager.GameGui.GetAddonByName("_NaviMap");
 
     private readonly ExcelSheet<Map>? _maps;
 
@@ -155,8 +155,8 @@ public unsafe class NaviMapManager : IDisposable
 
     public bool CheckIfLoading()
     {
-        var locationTitle = (AtkUnitBase*)ServiceManager.GameGui.GetAddonByName("_LocationTitle").Address;
-        var fadeMiddle = (AtkUnitBase*)ServiceManager.GameGui.GetAddonByName("FadeMiddle").Address;
+        var locationTitle = (AtkUnitBase*)ServiceManager.GameGui.GetAddonByName("_LocationTitle");
+        var fadeMiddle = (AtkUnitBase*)ServiceManager.GameGui.GetAddonByName("FadeMiddle");
         return Loading =
             locationTitle->IsVisible ||
             fadeMiddle->IsVisible;

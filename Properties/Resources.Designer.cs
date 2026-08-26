@@ -59,5 +59,131 @@ namespace MiniMappingway.Properties {
                 resourceCulture = value;
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Border Brightness.
+        /// </summary>
+        internal static string BorderBrightness {
+            get {
+                return ResourceManager.GetString("BorderBrightness", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Border Radius.
+        /// </summary>
+        internal static string BorderRadius {
+            get {
+                return ResourceManager.GetString("BorderRadius", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Circle Size.
+        /// </summary>
+        internal static string CircleSize {
+            get {
+                return ResourceManager.GetString("CircleSize", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Opens Mini-Mappingway settings.
+        /// </summary>
+        internal static string CommandHelpMessage {
+            get {
+                return ResourceManager.GetString("CommandHelpMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enabled.
+        /// </summary>
+        internal static string Enabled {
+            get {
+                return ResourceManager.GetString("Enabled", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;Everyone&quot; is always the lowest priority.
+        /// </summary>
+        internal static string EveryoneLowestPriority {
+            get {
+                return ResourceManager.GetString("EveryoneLowestPriority", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to If you have a common FC tag you may wish to disable this..
+        /// </summary>
+        internal static string FcTagCommonNotice {
+            get {
+                return ResourceManager.GetString("FcTagCommonNotice", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to For now FC members are found by comparing FC tags..
+        /// </summary>
+        internal static string FcTagComparisonNotice {
+            get {
+                return ResourceManager.GetString("FcTagComparisonNotice", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Marker Colour. Click the colored square for a picker..
+        /// </summary>
+        internal static string MarkerColourDescription {
+            get {
+                return ResourceManager.GetString("MarkerColourDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Marker settings, ordered by priority:.
+        /// </summary>
+        internal static string MarkerSettingsHeader {
+            get {
+                return ResourceManager.GetString("MarkerSettingsHeader", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Priority, higher shows on top of lower.
+        /// </summary>
+        internal static string PriorityDescription {
+            get {
+                return ResourceManager.GetString("PriorityDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Priority {0} is already taken.
+        /// </summary>
+        internal static string PriorityTaken {
+            get {
+                return ResourceManager.GetString("PriorityTaken", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mini-Mappingway Settings.
+        /// </summary>
+        internal static string SettingsWindowTitle {
+            get {
+                return ResourceManager.GetString("SettingsWindowTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Show Border.
+        /// </summary>
+        internal static string ShowBorder {
+            get {
+                return ResourceManager.GetString("ShowBorder", resourceCulture);
+            }
+        }
     }
 }

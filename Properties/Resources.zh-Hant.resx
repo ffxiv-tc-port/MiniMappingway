@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xsd:element name="root" msdata:IsDataSet="true">
+			<xsd:complexType>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="data">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="resheader">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" />
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:complexType>
+		</xsd:element>
+	</xsd:schema>
+	<resheader name="resmimetype">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="version">
+		<value>1.3</value>
+	</resheader>
+	<resheader name="reader">
+		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<resheader name="writer">
+		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<data name="BorderBrightness" xml:space="preserve">
+		<value>邊框亮度</value>
+	</data>
+	<data name="BorderRadius" xml:space="preserve">
+		<value>邊框半徑</value>
+	</data>
+	<data name="CircleSize" xml:space="preserve">
+		<value>圓圈大小</value>
+	</data>
+	<data name="CommandHelpMessage" xml:space="preserve">
+		<value>開啟 Mini-Mappingway 設定</value>
+	</data>
+	<data name="Enabled" xml:space="preserve">
+		<value>啟用</value>
+	</data>
+	<data name="EveryoneLowestPriority" xml:space="preserve">
+		<value>「所有人」永遠是最低優先度</value>
+	</data>
+	<data name="FcTagCommonNotice" xml:space="preserve">
+		<value>若您的公會標籤較常見，您可能會想停用此功能。</value>
+	</data>
+	<data name="FcTagComparisonNotice" xml:space="preserve">
+		<value>目前是透過比對公會標籤來尋找公會成員。</value>
+	</data>
+	<data name="MarkerColourDescription" xml:space="preserve">
+		<value>標記顏色。點擊色塊可開啟選色器。</value>
+	</data>
+	<data name="MarkerSettingsHeader" xml:space="preserve">
+		<value>標記設定（依優先度排序）：</value>
+	</data>
+	<data name="PriorityDescription" xml:space="preserve">
+		<value>優先度，數值越高顯示在越上層</value>
+	</data>
+	<data name="PriorityTaken" xml:space="preserve">
+		<value>優先度 {0} 已被使用</value>
+	</data>
+	<data name="SettingsWindowTitle" xml:space="preserve">
+		<value>Mini-Mappingway 設定</value>
+	</data>
+	<data name="ShowBorder" xml:space="preserve">
+		<value>顯示邊框</value>
+	</data>
+</root>

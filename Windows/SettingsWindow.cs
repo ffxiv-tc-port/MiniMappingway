@@ -1,8 +1,9 @@
 ﻿using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
-using Dalamud.Bindings.ImGui;
+using ImGuiNET;
 using MiniMappingway.Manager;
 using MiniMappingway.Model;
+using MiniMappingway.Properties;
 using MiniMappingway.Service;
 using System.Linq;
 using System.Numerics;
@@ -11,7 +12,7 @@ namespace MiniMappingway.Windows;
 
 public class SettingsWindow : Window
 {
-    public SettingsWindow() : base("Mini-Mappingway Settings")
+    public SettingsWindow() : base(Resources.SettingsWindowTitle)
     {
         Size = new Vector2(450, 405);
         SizeCondition = ImGuiCond.Once;
@@ -29,16 +30,16 @@ public class SettingsWindow : Window
     {
         // can't ref a property, so use a local copy
         var enabled = ServiceManager.Configuration.Enabled;
-        if (ImGui.Checkbox("Enabled", ref enabled))
+        if (ImGui.Checkbox(Resources.Enabled, ref enabled))
         {
             ServiceManager.Configuration.Enabled = enabled;
             ServiceManager.Configuration.Save();
         }
 
-        ImGui.TextColored(new Vector4(255, 0, 0, 255), "For now FC members are found by comparing FC tags.");
-        ImGui.TextColored(new Vector4(255, 0, 0, 255), "If you have a common FC tag you may wish to disable this.");
+        ImGui.TextColored(new Vector4(255, 0, 0, 255), Resources.FcTagComparisonNotice);
+        ImGui.TextColored(new Vector4(255, 0, 0, 255), Resources.FcTagCommonNotice);
 
-        ImGui.Text("Marker settings, ordered by priority:");
+        ImGui.Text(Resources.MarkerSettingsHeader);
 
         foreach (var source in ServiceManager.NaviMapManager.SourceDataDict.OrderBy(x => x.Value.Priority))
         {
@@ -49,7 +50,7 @@ public class SettingsWindow : Window
                 ImGui.Text(source.Key);
 
                 var enabledLocal = sourceDataLocal.Enabled;
-                if (ImGui.Checkbox("Enabled", ref enabledLocal))
+                if (ImGui.Checkbox(Resources.Enabled, ref enabledLocal))
                 {
                     sourceDataLocal.Enabled = enabledLocal;
                 }
@@ -61,7 +62,7 @@ public class SettingsWindow : Window
 
                 if (source.Key == FinderService.EveryoneKey)
                 {
-                    ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1), "  \"Everyone\" is always the lowest priority");
+                    ImGui.TextColored(new Vector4(0.7f, 0.7f, 0.7f, 1), "  " + Resources.EveryoneLowestPriority);
 
                 }
                 else
@@ -89,17 +90,17 @@ public class SettingsWindow : Window
                     ImGui.SameLine();
                     if (isPriorityError)
                     {
-                        ImGui.TextColored(new Vector4(1, 0, 0, 1), $"Priority {tempPriority} is already taken");
+                        ImGui.TextColored(new Vector4(1, 0, 0, 1), string.Format(Resources.PriorityTaken, tempPriority));
                     }
                     else
                     {
-                        ImGui.Text("Priority, higher shows on top of lower");
+                        ImGui.Text(Resources.PriorityDescription);
                     }
 
                 }
 
                 var color = ImGui.ColorConvertU32ToFloat4(source.Value.Color);
-                ImGui.Text("Marker Colour. Click the colored square for a picker.");
+                ImGui.Text(Resources.MarkerColourDescription);
                 if (ImGui.ColorEdit4("##color", ref color, ImGuiColorEditFlags.NoAlpha))
                 {
 
@@ -109,26 +110,26 @@ public class SettingsWindow : Window
 
                 }
                 var circleSizeLocal = source.Value.CircleSize;
-                if (ImGui.SliderInt("Circle Size", ref circleSizeLocal, 1, 20))
+                if (ImGui.SliderInt(Resources.CircleSize, ref circleSizeLocal, 1, 20))
                 {
                     sourceDataLocal.CircleSize = circleSizeLocal;
                 }
 
                 var border = sourceDataLocal.ShowBorder;
-                if (ImGui.Checkbox("Show Border", ref border))
+                if (ImGui.Checkbox(Resources.ShowBorder, ref border))
                 {
                     sourceDataLocal.ShowBorder = border;
                 }
 
                 var darkeningAmount = sourceDataLocal.BorderDarkeningAmount;
-                if (ImGui.SliderFloat("Border Brightness", ref darkeningAmount, 0.0f, 2f))
+                if (ImGui.SliderFloat(Resources.BorderBrightness, ref darkeningAmount, 0.0f, 2f))
                 {
                     sourceDataLocal.BorderDarkeningAmount = darkeningAmount;
                     sourceDataLocal.BorderValid = false;
                 }
 
                 var borderRadius = sourceDataLocal.BorderRadius;
-                if (ImGui.SliderInt("Border Radius", ref borderRadius, 1, 10))
+                if (ImGui.SliderInt(Resources.BorderRadius, ref borderRadius, 1, 10))
                 {
                     sourceDataLocal.BorderRadius = borderRadius;
                 }
