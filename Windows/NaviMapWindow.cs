@@ -100,6 +100,7 @@ internal class NaviMapWindow : Window
 
     public override void PreDraw()
     {
+        base.PreDraw();
         MarkerUtility.PrepareDrawOnMinimap();
 
     }

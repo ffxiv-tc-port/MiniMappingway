@@ -124,6 +124,7 @@ internal class PvpRadarWindow : Window
 
     public override void PreDraw()
     {
+        base.PreDraw();
         var viewport = ImGui.GetMainViewport();
         Position = viewport.Pos;
         Size = viewport.Size;
