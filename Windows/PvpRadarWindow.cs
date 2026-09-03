@@ -424,7 +424,7 @@ internal class PvpRadarWindow : Window
     }
 
     /// <summary>
-    /// 節流的 Information 級診斷(使用者跑 LogLevel 2,Debug/Verbose 收不到)。
+    /// 節流的 Information 級診斷(使用者跑 LogLevel 1,盲區只有 Verbose,Debug 收得到但單檔數十萬行會淹沒)。
     /// 最關鍵的欄位是 zeroHardTarget:如果它長期等於 scannedPlayers,代表本機端根本沒有
     /// 其他玩家的目標資料(或欄位對不上台服),而不是「真的沒人選我為目標」。
     /// </summary>
