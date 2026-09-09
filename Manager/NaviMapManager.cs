@@ -345,34 +345,80 @@ public unsafe class NaviMapManager : IDisposable
         return dict.TryAdd((int)personIndex, details);
     }
 
+    /// <summary>
+    /// 從某個來源的清單裡移除一個人(依 <c>GameObjectId</c>)。不在清單裡時回 <see langword="false"/>。
+    /// </summary>
+    /// <remarks>
+    /// ⚠️ <b>以前這裡是 <c>dict.First(述詞)</c>——找不到時擲 <c>InvalidOperationException</c></b>,
+    /// 而 <see cref="Api.ApiController"/> 的類別註解逐字承諾「移除不在清單裡的人是安全的,會回 false」。
+    /// 這一支同時掛在兩條路徑上,兩條的失敗都很難歸因:
+    /// <list type="number">
+    /// <item><b>繪製路徑</b>(<c>MarkerUtility.PrepareDrawOnMinimap</c>)擲例外 ⇒ Dalamud 的視窗
+    /// 錯誤閂鎖把整個疊加層換成錯誤面板,要手動按才回得來。</item>
+    /// <item><b>IPC 端點</b>擲例外 ⇒ 呼叫端拿到的是 <c>TargetInvocationException</c>
+    /// (CallGate 走 <c>DynamicInvoke</c>),而跨外掛慣用的 <c>catch (IpcError)</c> 攔不到它。</item>
+    /// </list>
+    /// </remarks>
     public bool RemoveFromBag(ulong id, string sourceName)
     {
-        PersonDict.TryGetValue(sourceName, out var dict);
-        if (dict == null)
+        if (!PersonDict.TryGetValue(sourceName, out var dict) || dict == null)
         {
             return false;
         }
-        var entry = dict.First(x => x.Value.Id == id);
-        return dict.TryRemove(entry);
 
+        foreach (var entry in dict)
+        {
+            if (entry.Value.Id != id)
+            {
+                continue;
+            }
+
+            return dict.TryRemove(entry);
+        }
+
+        return false;
     }
 
+    /// <summary>依名稱移除。找不到時回 <see langword="false"/>(理由同上一支)。</summary>
     public bool RemoveFromBag(string name, string sourceName)
     {
-        PersonDict.TryGetValue(sourceName, out var dict);
-        if (dict == null)
+        if (!PersonDict.TryGetValue(sourceName, out var dict) || dict == null)
         {
             return false;
         }
-        var entry = dict.First(x => x.Value.Name == name);
-        return dict.TryRemove(entry);
 
+        foreach (var entry in dict)
+        {
+            if (entry.Value.Name != name)
+            {
+                continue;
+            }
+
+            return dict.TryRemove(entry);
+        }
+
+        return false;
     }
 
+    /// <summary>
+    /// 整個來源連同它的人一起移除。
+    /// </summary>
+    /// <remarks>
+    /// 🔴 <b>以前只清空 <see cref="PersonDict"/> 的內容、沒有移除那個鍵</b>,於是這一支跑完之後
+    /// <see cref="PersonDict"/> 還有這個來源、<see cref="SourceDataDict"/> 已經沒有了。
+    /// 而 <c>MarkerUtility.PrepareDrawOnMinimap</c> 與 <c>FinderService.CheckSamePerson</c>
+    /// 都是<b>走訪 PersonDict、拿鍵去索引 SourceDataDict</b> ⇒ <c>KeyNotFoundException</c>。
+    /// 前者在繪製路徑上,擲一次就會被 Dalamud 的視窗錯誤閂鎖換成錯誤面板。
+    /// ⚠️ 這條路徑只有 IPC 消費端走得到(內建的三個來源從不移除),所以在沒有任何消費端的
+    /// 期間它一直是潛伏的。
+    /// </remarks>
     public bool RemoveSourceAndPeople(string sourceName)
     {
         var successPerson = ClearPersonBag(sourceName);
         var successSource = SourceDataDict.TryRemove(sourceName, out _);
+
+        // 🔑 鍵本身也要拿掉,否則留下一個「有人清單、沒有來源設定」的孤兒鍵。
+        PersonDict.TryRemove(sourceName, out _);
 
         return successPerson && successSource;
     }

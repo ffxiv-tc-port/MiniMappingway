@@ -26,7 +26,25 @@ namespace MiniMappingway.Api;
 public class ApiController : IDisposable
 {
     private const int ApiVersionMajor = 1;
-    private const int ApiVersionMinor = 1;
+
+    /// <summary>
+    /// 次版號。1 → 2：<see cref="AddPerson"/> 開始支援<b>非玩家</b>的物件
+    /// （寶箱、風脈泉、採集點……）。
+    /// </summary>
+    /// <remarks>
+    /// 🔴 <b>次版號 1 的時候 IPC 端點對非玩家物件是完全靜默地不生效的</b>，成因有兩個，
+    /// 兩個都不會擲例外也不會寫記錄：
+    /// <list type="number">
+    /// <item><c>MarkerUtility.GetObjIndexById</c> 只掃物件表的偶數索引 2..200
+    /// （＝CharacterManager 的玩家欄位）⇒ 寶箱／風脈泉那一段（449-488）永遠找不到
+    /// ⇒ <see cref="AddPerson"/> 回 false。</item>
+    /// <item>就算加得進去，繪製與巡檢兩條路徑都硬性要求 <c>ObjectKind.Player</c>，
+    /// 不是玩家的當幀就被移除。</item>
+    /// </list>
+    /// ⇒ 消費端要顯示非玩家物件時，判準請用<b>次版號 &gt;= 2</b>；
+    /// 只用來顯示玩家的消費端維持 &gt;= 1 即可。
+    /// </remarks>
+    private const int ApiVersionMinor = 2;
 
     private readonly ICallGateProvider<Tuple<int, int>> _getVersionIpc = ServiceManager.DalamudPluginInterface.GetIpcProvider<Tuple<int, int>>("MiniMappingway.CheckVersion");
 
@@ -105,8 +123,18 @@ public class ApiController : IDisposable
     /// </summary>
     /// <param name="sourceName">Source name</param>
     /// <param name="name">Name of person as seen in ObjectTable</param>
-    /// <param name="id">Id of person in ObjectTable</param>
+    /// <param name="id">
+    /// <c>GameObjectId</c> of the object in the ObjectTable.
+    /// ⚠️ This parameter is <c>uint</c> while <c>IGameObject.GameObjectId</c> is <c>ulong</c>:
+    /// objects whose id does not fit in 32 bits cannot be addressed through this endpoint
+    /// (the call simply returns false).
+    /// </param>
     /// <returns>Success boolean</returns>
+    /// <remarks>
+    /// 📌 Since API 1.2 the object does <b>not</b> have to be a player: treasure coffers,
+    /// aether currents and gathering points work too. Entries added through this endpoint are
+    /// tracked by <c>GameObjectId</c> and are never reinterpreted as <c>Character*</c>.
+    /// </remarks>
     private bool AddPerson(string sourceName, string name, uint id)
     {
         var person = ServiceManager.ObjectTable.SearchById(id);
@@ -114,7 +142,8 @@ public class ApiController : IDisposable
         {
             return false;
         }
-        return ServiceManager.NaviMapManager.AddToBag(new PersonDetails(name, id, sourceName, person.Address));
+        return ServiceManager.NaviMapManager.AddToBag(
+            new PersonDetails(name, id, sourceName, person.Address, anyObjectKind: true));
     }
 
     /// <summary>

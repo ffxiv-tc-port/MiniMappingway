@@ -55,7 +55,10 @@ public sealed class FinderService : IDisposable
     {
         foreach (var dict in ServiceManager.NaviMapManager.PersonDict)
         {
-            if (!ServiceManager.NaviMapManager.SourceDataDict[dict.Key].Enabled)
+            // 🔴 索引器對「已經被 IPC 移除的來源」會擲 KeyNotFoundException,
+            //    而這一支掛在 Framework.Update 上 ⇒ 每幀擲一次。
+            if (!ServiceManager.NaviMapManager.SourceDataDict.TryGetValue(dict.Key, out var sourceData)
+                || !sourceData.Enabled)
             {
                 continue;
             }
@@ -74,6 +77,18 @@ public sealed class FinderService : IDisposable
             var current = ServiceManager.ObjectTable[i];
             if (current == null)
             {
+                continue;
+            }
+
+            // 外部來源(IPC)標的可能不是玩家。那條路徑一個 Character* 都不轉,
+            // 身分比對改用 GameObjectId(位址相同不代表還是同一個東西)。
+            if (person.AnyObjectKind)
+            {
+                if (current.GameObjectId != person.Id)
+                {
+                    ServiceManager.NaviMapManager.RemoveFromBag(person.Id, dict.Key);
+                }
+
                 continue;
             }
 

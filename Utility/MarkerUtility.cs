@@ -37,18 +37,40 @@ internal static class MarkerUtility
         // 之後所有解參考都走這次重查到的位址。
         var personObj = ServiceManager.ObjectTable[person.Key];
 
-        if (personObj == null || personObj.Address != person.Value.Ptr
-            || (byte)((Character*)personObj.Address)->GameObject.ObjectKind != (byte)ObjectKind.Player)
+        if (personObj == null)
         {
             ServiceManager.NaviMapManager.RemoveFromBag(person.Value.Id, person.Value.SourceName);
             return null;
         }
 
-        var isPartyMember = ((Character*)personObj.Address)->IsAllianceMember || ((Character*)personObj.Address)->IsPartyMember;
-
-        if (isPartyMember)
+        if (person.Value.AnyObjectKind)
         {
-            return null;
+            // 外部來源(IPC)標的可能是寶箱、風脈泉這類非玩家物件。
+            // 🔴 這條路徑一個 Character* 都不轉:非玩家物件的配置比 Character 小很多,
+            //    讀 IsPartyMember/IsAllianceMember 會落在配置範圍外,而那是攔不到的 AVE。
+            // 🔴 身分比對用 GameObjectId 不用 Address:slot 被釋放之後另一個物件可能剛好
+            //    配置在同一個位址,位址相同不代表還是同一個東西。
+            if (personObj.GameObjectId != person.Value.Id)
+            {
+                ServiceManager.NaviMapManager.RemoveFromBag(person.Value.Id, person.Value.SourceName);
+                return null;
+            }
+        }
+        else
+        {
+            if (personObj.Address != person.Value.Ptr
+                || (byte)((Character*)personObj.Address)->GameObject.ObjectKind != (byte)ObjectKind.Player)
+            {
+                ServiceManager.NaviMapManager.RemoveFromBag(person.Value.Id, person.Value.SourceName);
+                return null;
+            }
+
+            var isPartyMember = ((Character*)personObj.Address)->IsAllianceMember || ((Character*)personObj.Address)->IsPartyMember;
+
+            if (isPartyMember)
+            {
+                return null;
+            }
         }
 
         //Calculate the relative position in world coords
@@ -115,7 +137,14 @@ internal static class MarkerUtility
 
         foreach (var dict in ServiceManager.NaviMapManager.PersonDict)
         {
-            var priority = ServiceManager.NaviMapManager.SourceDataDict[dict.Key].Priority;
+            // 🔴 這裡是繪製路徑:索引器擲 KeyNotFoundException 會讓 Dalamud 把整扇視窗換成
+            //    錯誤面板。兩個字典是分開更新的(來源可能剛被 IPC 移除),不保證同步。
+            if (!ServiceManager.NaviMapManager.SourceDataDict.TryGetValue(dict.Key, out var sourceData))
+            {
+                continue;
+            }
+
+            var priority = sourceData.Priority;
 
             if (!ServiceManager.NaviMapManager.CircleData.ContainsKey(priority))
             {
@@ -172,18 +201,46 @@ internal static class MarkerUtility
             }
 
             PlayerPos = new Vector2(player->GameObject.Position.X, player->GameObject.Position.Z);
+
+            // ⚠️ 這個旗標以前只在 FinderService.LookFor 裡更新,而那支在「三個內建來源全部關掉」時
+            //    會提早 return ⇒ 旗標就停在最後一次寫入的值。停在 true 的話
+            //    NaviMapWindow.DrawConditions 會永遠回 false,整個疊加層再也不畫,而且沒有任何徵兆。
+            //    只靠 IPC 來源(不看好友/部隊/所有人)的使用者必定踩到,所以改在這裡每幀更新。
+            ServiceManager.NaviMapManager.InCombat = player->InCombat;
         }
         ChecksPassed = true;
         return true;
     }
 
+    /// <summary>
+    /// 物件表裡這個 <c>GameObjectId</c> 在第幾格;找不到回 <see langword="null"/>。
+    /// </summary>
+    /// <remarks>
+    /// 🔴 <b>以前只掃偶數索引 2..200</b>(＝CharacterManager 的玩家欄位),於是任何不是玩家的
+    /// 物件一律回 null ⇒ <c>AddToBag</c> 回 false ⇒ IPC 的 <c>AddPerson</c> 永遠失敗,
+    /// <b>不擲例外、不寫記錄,跟「這個物件不存在」長得一模一樣</b>。
+    /// <para>
+    /// 📌 物件表的分區(逐字取自 FFXIVClientStructs <c>GameObjectManager.ObjectArrays</c> 的註解):
+    /// 000-199 CharacterManager(偶數格是 BattleChara、奇數格是它的坐騎/寵物)、
+    /// 200-448 ClientObjectManager、449-488 EventObjectManager
+    /// (AreaObject／EventObject／GatheringPointObject／HousingObject／Treasure)、
+    /// 489-628 StandObjectManager、629-728 ReactionEventObjectManager、729-818 MJI/WKS。
+    /// <b>寶箱與風脈泉都落在 449-488 那一段</b>,舊的掃描範圍永遠碰不到。
+    /// </para>
+    /// <para>
+    /// 📌 對三個內建來源沒有任何行為差異:<c>GameObjectId</c> 是唯一的,全表掃描找到的
+    /// 仍然是同一格。只有在加入的當下呼叫一次,不在每幀路徑上。
+    /// </para>
+    /// </remarks>
     public static int? GetObjIndexById(ulong objId)
     {
-        foreach (var x in Enumerable.Range(2, 200).Where(x => x % 2 == 0))
+        var length = ServiceManager.ObjectTable.Length;
+
+        for (var i = 0; i < length; i++)
         {
-            if (ServiceManager.ObjectTable[x] != null && ServiceManager.ObjectTable[x]?.GameObjectId == objId)
+            if (ServiceManager.ObjectTable[i]?.GameObjectId == objId)
             {
-                return x;
+                return i;
             }
         }
 

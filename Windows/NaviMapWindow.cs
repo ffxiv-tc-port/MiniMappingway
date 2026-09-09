@@ -63,8 +63,10 @@ internal class NaviMapWindow : Window
                     continue;
                 }
 
-                var circleConfig = ServiceManager.NaviMapManager.SourceDataDict[circle.SourceName];
-                if (!circleConfig.Enabled)
+                // 🔴 繪製路徑不可以用索引器:圓點是在 PreDraw 排進佇列的,來源有可能在那之後
+                //    被 IPC 移除,而 KeyNotFoundException 會讓整扇視窗被換成錯誤面板。
+                if (!ServiceManager.NaviMapManager.SourceDataDict.TryGetValue(circle.SourceName, out var circleConfig)
+                    || !circleConfig.Enabled)
                 {
                     continue;
                 }
