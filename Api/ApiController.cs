@@ -78,6 +78,12 @@ public class ApiController : IDisposable
     /// Get Version
     /// </summary>
     /// <returns>A tuple of Major and Minor version numbers</returns>
+    /// <remarks>
+    /// 📌 這一支<b>刻意沒有</b>套 <see cref="IpcFrameworkGate"/>：它只回兩個常數，
+    /// 不碰原生記憶體也不碰任何共用集合，在哪條執行緒上跑都一樣。
+    /// 消費端通常是在自己的背景工作裡先問版本再決定要不要用，
+    /// 不該為此多等一幀。
+    /// </remarks>
     private Tuple<int, int> CheckVersion()
     {
         return new Tuple<int, int>(ApiVersionMajor, ApiVersionMinor);
@@ -91,7 +97,10 @@ public class ApiController : IDisposable
     /// <returns>Success boolean</returns>
     private bool RegisterOrUpdateSource(string sourceName, Vector4 color)
     {
-        return ServiceManager.NaviMapManager.AddOrUpdateSource(sourceName, color);
+        return IpcFrameworkGate.Get("MiniMappingway.RegisterOrUpdateSourceVec", () =>
+        {
+            return ServiceManager.NaviMapManager.AddOrUpdateSource(sourceName, color);
+        }, false);
     }
 
     /// <summary>
@@ -102,7 +111,10 @@ public class ApiController : IDisposable
     /// <returns>Success boolean</returns>
     private bool RegisterOrUpdateSource(string sourceName, uint color)
     {
-        return ServiceManager.NaviMapManager.AddOrUpdateSource(sourceName, color);
+        return IpcFrameworkGate.Get("MiniMappingway.RegisterOrUpdateSourceUint", () =>
+        {
+            return ServiceManager.NaviMapManager.AddOrUpdateSource(sourceName, color);
+        }, false);
     }
 
     //I don't like the below method, I may rewrite it, please don't use it
@@ -134,16 +146,34 @@ public class ApiController : IDisposable
     /// 📌 Since API 1.2 the object does <b>not</b> have to be a player: treasure coffers,
     /// aether currents and gathering points work too. Entries added through this endpoint are
     /// tracked by <c>GameObjectId</c> and are never reinterpreted as <c>Character*</c>.
+    /// <para>
+    /// 🔴🔴 <b>整段交回遊戲主執行緒執行</b>（<see cref="IpcFrameworkGate"/>）：這一支要走訪
+    /// 物件表<b>兩次</b> —— 這裡的 <c>ObjectTable.SearchById</c>，以及
+    /// <c>NaviMapManager.AddToBag</c> 裡的 <c>MarkerUtility.GetObjIndexById</c>
+    /// （後者逐格讀 <c>ObjectTable[i]</c>）。而 CallGate 是直接方法呼叫，這一支原本跑在
+    /// <b>呼叫端的執行緒</b>上。本 pin 的物件表是每格預先配好一個包裝、存取時就地改寫它的
+    /// <c>Address</c> 再交出來（<c>ObjectTable.cs:198-231</c>）⇒ 在別條執行緒上取元素
+    /// 可能拿到<b>別人的位址或懸空位址</b>，那是攔不到的 AccessViolationException。
+    /// </para>
+    /// <para>
+    /// 📌 <c>PersonDetails.Ptr</c> 存的是記錄當下的位址，但它<b>從來不被解參考</b> ——
+    /// 只在內建來源那條路徑上當「這個 slot 有沒有換人」的身分比對用；
+    /// 透過本端點加進來的（<c>AnyObjectKind == true</c>）連比對都改用 <c>GameObjectId</c>，
+    /// 所以那一半不需要動。
+    /// </para>
     /// </remarks>
     private bool AddPerson(string sourceName, string name, uint id)
     {
-        var person = ServiceManager.ObjectTable.SearchById(id);
-        if (person == null)
+        return IpcFrameworkGate.Get("MiniMappingway.AddPerson", () =>
         {
-            return false;
-        }
-        return ServiceManager.NaviMapManager.AddToBag(
-            new PersonDetails(name, id, sourceName, person.Address, anyObjectKind: true));
+            var person = ServiceManager.ObjectTable.SearchById(id);
+            if (person == null)
+            {
+                return false;
+            }
+            return ServiceManager.NaviMapManager.AddToBag(
+                new PersonDetails(name, id, sourceName, person.Address, anyObjectKind: true));
+        }, false);
     }
 
     /// <summary>
@@ -154,7 +184,10 @@ public class ApiController : IDisposable
     /// <returns>Success boolean</returns>
     private bool RemovePerson(string name, string sourceName)
     {
-        return ServiceManager.NaviMapManager.RemoveFromBag(name, sourceName);
+        return IpcFrameworkGate.Get("MiniMappingway.RemovePersonByName", () =>
+        {
+            return ServiceManager.NaviMapManager.RemoveFromBag(name, sourceName);
+        }, false);
     }
 
     /// <summary>
@@ -165,7 +198,10 @@ public class ApiController : IDisposable
     /// <returns>Success boolean</returns>
     private bool RemovePerson(uint id, string sourceName)
     {
-        return ServiceManager.NaviMapManager.RemoveFromBag(id, sourceName);
+        return IpcFrameworkGate.Get("MiniMappingway.RemovePersonByUint", () =>
+        {
+            return ServiceManager.NaviMapManager.RemoveFromBag(id, sourceName);
+        }, false);
     }
 
     /// <summary>
@@ -175,7 +211,10 @@ public class ApiController : IDisposable
     /// <returns>Success boolean</returns>
     private bool RemoveSourceAndPeople(string sourceName)
     {
-        return ServiceManager.NaviMapManager.RemoveSourceAndPeople(sourceName);
+        return IpcFrameworkGate.Get("MiniMappingway.RemoveSourceAndPeople", () =>
+        {
+            return ServiceManager.NaviMapManager.RemoveSourceAndPeople(sourceName);
+        }, false);
     }
 
     public void Dispose()
