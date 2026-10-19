@@ -47,24 +47,20 @@ internal class NaviMapWindow : Window
             ImGui.Text($"people {count}");
         }
 
-        //foreach (var keyValuePair in ServiceManager.NaviMapManager.CircleData.Where(x => x.Value.Any()))
-        foreach (var i in ServiceManager.NaviMapManager.CircleData.Where(x => x.Value.Any()).OrderBy(x => x.Key))
+        // 優先度由小到大畫（大的蓋在上面）；順序表由排圓點的那一端維護，這裡不必每幀排序。
+        foreach (var priority in MarkerUtility.CirclePriorities)
         {
-            ServiceManager.NaviMapManager.CircleData.TryGetValue(i.Key, out var keyValuePair);
+            ServiceManager.NaviMapManager.CircleData.TryGetValue(priority, out var keyValuePair);
             if (keyValuePair == null)
             {
                 continue;
             }
-            while (keyValuePair.Any())
+            while (keyValuePair.TryDequeue(out var circle))
             {
-                keyValuePair.TryDequeue(out var circle);
-                if (circle == null)
-                {
-                    continue;
-                }
-
-                var circleConfig = ServiceManager.NaviMapManager.SourceDataDict[circle.SourceName];
-                if (!circleConfig.Enabled)
+                // 🔴 繪製路徑不可以用索引器:圓點是在 PreDraw 排進佇列的,來源有可能在那之後
+                //    被 IPC 移除,而 KeyNotFoundException 會讓整扇視窗被換成錯誤面板。
+                if (!ServiceManager.NaviMapManager.SourceDataDict.TryGetValue(circle.SourceName, out var circleConfig)
+                    || !circleConfig.Enabled)
                 {
                     continue;
                 }
@@ -100,6 +96,7 @@ internal class NaviMapWindow : Window
 
     public override void PreDraw()
     {
+        base.PreDraw();
         MarkerUtility.PrepareDrawOnMinimap();
 
     }

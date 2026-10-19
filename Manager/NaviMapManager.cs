@@ -21,6 +21,12 @@ public unsafe class NaviMapManager : IDisposable
 
     public readonly ConcurrentDictionary<string, SourceData> SourceDataDict = new();
 
+    // PersonDict 的鍵與值只在本類別改（註冊來源、移除來源、Dispose），改完都把這份清掉。
+    private KeyValuePair<string, ConcurrentDictionary<int, PersonDetails>>[]? _sources;
+
+    /// <summary>逐來源走訪用：內容與順序等同直接列舉 <see cref="PersonDict"/>，但不必每幀配置列舉器。只在 framework 執行緒用。</summary>
+    public KeyValuePair<string, ConcurrentDictionary<int, PersonDetails>>[] Sources => _sources ??= PersonDict.ToArray();
+
     public int X;
 
     public int Y;
@@ -68,6 +74,7 @@ public unsafe class NaviMapManager : IDisposable
             SourceDataDict.AddOrUpdate(sourceName, source, (_, _) => source);
             PersonDict.AddOrUpdate(sourceName, new ConcurrentDictionary<int, PersonDetails>(),
                 (_, _) => new ConcurrentDictionary<int, PersonDetails>());
+            _sources = null;
         }
         else
         {
@@ -76,6 +83,7 @@ public unsafe class NaviMapManager : IDisposable
             SourceDataDict.AddOrUpdate(sourceName, sourceData, (_, _) => sourceData);
             PersonDict.AddOrUpdate(sourceName, new ConcurrentDictionary<int, PersonDetails>(),
                 (_, _) => new ConcurrentDictionary<int, PersonDetails>());
+            _sources = null;
 
         }
 
@@ -89,6 +97,7 @@ public unsafe class NaviMapManager : IDisposable
             SourceDataDict.AddOrUpdate(sourceName, source, (_, _) => source);
             PersonDict.AddOrUpdate(sourceName, new ConcurrentDictionary<int, PersonDetails>(),
                 (_, _) => new ConcurrentDictionary<int, PersonDetails>());
+            _sources = null;
 
         }
         else
@@ -116,50 +125,113 @@ public unsafe class NaviMapManager : IDisposable
             SourceDataDict.AddOrUpdate(sourceName, sourceData, (_, _) => sourceData);
             PersonDict.AddOrUpdate(sourceName, new ConcurrentDictionary<int, PersonDetails>(),
                 (_, _) => new ConcurrentDictionary<int, PersonDetails>());
+            _sources = null;
         }
         return true;
     }
 
     public bool UpdateNaviMap()
     {
+        // 原生指標只在這次呼叫內使用,不存進欄位跨幀保留;每次呼叫都重新從 GameGui 解析。
+        var naviMap = NaviMapPointer;
 
-        if (NaviMapPointer == null)
+        if (naviMap == null)
         {
             return false;
         }
 
-        //There's probably a better way of doing this but I don't know it for now
-        IsLocked = ((AtkComponentCheckBox*)NaviMapPointer->GetNodeById(4)->GetComponent())->IsChecked;
-
-        if (NaviMapPointer->UldManager.LoadedState != AtkLoadState.Loaded)
+        // UldManager 尚未載入完成時 NodeList / NodeListCount 可能未初始化或已失效,
+        // 此時呼叫 GetNodeById 會走到無效節點。所有節點存取都必須排在這個檢查之後。
+        if (naviMap->UldManager.LoadedState != AtkLoadState.Loaded)
         {
             return false;
         }
-        try
+
+        // 以下每一跳都做 null 與型別檢查,任何一跳失敗就保留前一次的值(fail-closed)。
+        // 刻意不使用 try/catch:懸空指標造成的 AccessViolationException 在 .NET Core 屬於
+        // corrupted-state exception,try/catch 完全攔不到,加了只會製造假的安全感。
+
+        // 地圖鎖定核取方塊。
+        var lockComponent = GetComponentOfNode(naviMap->GetNodeById(4));
+        if (IsButtonDerivedComponent(lockComponent))
         {
-            Rotation = NaviMapPointer->GetNodeById(8)->Rotation;
-            Zoom = NaviMapPointer->GetNodeById(18)->GetComponent()->GetImageNodeById(6)->ScaleX;
-        }
-        catch
-        {
-            // ignored
+            IsLocked = ((AtkComponentCheckBox*)lockComponent)->IsChecked;
         }
 
-        X = NaviMapPointer->X;
-        Y = NaviMapPointer->Y;
-        NaviScale = NaviMapPointer->Scale;
-        Visible = (NaviMapPointer->IsVisible && NaviMapPointer->VisibilityFlags == 0);
+        var rotationNode = naviMap->GetNodeById(8);
+        if (rotationNode != null)
+        {
+            Rotation = rotationNode->Rotation;
+        }
+
+        var zoomComponent = GetComponentOfNode(naviMap->GetNodeById(18));
+        if (zoomComponent != null && zoomComponent->UldManager.LoadedState == AtkLoadState.Loaded)
+        {
+            var zoomImageNode = zoomComponent->GetImageNodeById(6);
+            if (zoomImageNode != null)
+            {
+                Zoom = zoomImageNode->ScaleX;
+            }
+        }
+
+        X = naviMap->X;
+        Y = naviMap->Y;
+        NaviScale = naviMap->Scale;
+        Visible = naviMap->IsVisible && naviMap->VisibilityFlags == 0;
 
         return true;
     }
 
+    /// <summary>
+    /// 取出 component 節點所掛的元件;節點為 null 或不是 component 節點時回傳 null。
+    /// AtkResNode 的結構大小是 0xB0,而 AtkComponentNode.Component 位在 0xB0,
+    /// 少了 Type 檢查就會讀到配置範圍外的記憶體。CS 對 component 節點的 Type 一律 >= 1000。
+    /// </summary>
+    private static AtkComponentBase* GetComponentOfNode(AtkResNode* node)
+    {
+        if (node == null || (int)node->Type < 1000)
+        {
+            return null;
+        }
+
+        return ((AtkComponentNode*)node)->Component;
+    }
+
+    /// <summary>
+    /// 元件是不是 AtkComponentButton 衍生型別(結構大小 0xF0)。
+    /// IsChecked 讀的是 AtkComponentButton.Flags(位於 0xE8),已經超出 AtkComponentBase
+    /// (0xC0)的範圍,所以必須先確認元件型別才可以讀。元件型別取自 uld 的
+    /// AtkUldComponentInfo,全程只走已定義的結構欄位,不對任意位址做探測。
+    /// </summary>
+    private static bool IsButtonDerivedComponent(AtkComponentBase* component)
+    {
+        if (component == null || component->UldManager.BaseType != AtkUldManagerBaseType.Component)
+        {
+            return false;
+        }
+
+        var info = (AtkUldComponentInfo*)component->UldManager.Objects;
+        if (info == null)
+        {
+            return false;
+        }
+
+        return info->ComponentType is ComponentType.Button
+                                   or ComponentType.CheckBox
+                                   or ComponentType.RadioButton
+                                   or ComponentType.ListItemRenderer
+                                   or ComponentType.HoldButton;
+    }
+
     public bool CheckIfLoading()
     {
+        // addon 沒開時 GetAddonByName 回傳 0,要先判空才能解參考。
+        // 這兩個 addon 都只在切換區域時才存在,不存在即代表沒有在讀取。
         var locationTitle = (AtkUnitBase*)ServiceManager.GameGui.GetAddonByName("_LocationTitle").Address;
         var fadeMiddle = (AtkUnitBase*)ServiceManager.GameGui.GetAddonByName("FadeMiddle").Address;
-        return Loading =
-            locationTitle->IsVisible ||
-            fadeMiddle->IsVisible;
+
+        return Loading = (locationTitle != null && locationTitle->IsVisible)
+                         || (fadeMiddle != null && fadeMiddle->IsVisible);
     }
 
     public void UpdateMap()
@@ -168,7 +240,18 @@ public unsafe class NaviMapManager : IDisposable
         {
             try
             {
-                var map = _maps.GetRow(GetMapId());
+                var mapId = GetMapId();
+                // GetMapId() 取不到 AgentMap 時回 0。Map 第 0 列是佔位列,拿它算出來的
+                // ZoneScale／Offset 會是錯的且完全靜默 —— 寧可保留上一次的值,下一次
+                // TerritoryChanged 會再更新一次。
+                if (mapId == 0)
+                {
+                    ServiceManager.Log.Debug(
+                        "[MiniMappingway] AgentMap 尚未就緒,這次不更新地圖比例與位移。");
+                    return;
+                }
+
+                var map = _maps.GetRow(mapId);
 
                 if (map.SizeFactor != 0)
                 {
@@ -188,9 +271,29 @@ public unsafe class NaviMapManager : IDisposable
         }
     }
 
+    /// <summary>
+    /// 取得目前地圖編號;取不到 <c>AgentMap</c> 時回 0(呼叫端必須把 0 當成「不知道」處理)。
+    /// </summary>
+    /// <remarks>
+    /// 🔴 <c>AgentMap.Instance()</c> 有兩種失效模式:鏈上任一層回 null 就回 null(登入前、切場景、登出後都是常態),
+    /// 特徵碼失配時則擲 <c>InvalidOperationException</c>——只擋一種等於假防護。
+    /// 裸解參考 null 原生指標是 AccessViolationException,<c>try/catch</c> 攔不到 ⇒ 只能事前判空。
+    /// ⚠️ 這條路徑其中一個呼叫端是 <c>NaviMapManager</c> 的建構子,也就是外掛載入的當下 ——
+    /// 在標題畫面載入外掛時 AgentMap 必定還不存在,那是最容易踩到的情境。
+    /// </remarks>
     private uint GetMapId()
     {
-        return AgentMap.Instance()->CurrentMapId;
+        AgentMap* agent;
+        try
+        {
+            agent = AgentMap.Instance();
+        }
+        catch
+        {
+            return 0;
+        }
+
+        return agent == null ? 0u : agent->CurrentMapId;
     }
 
     public bool ClearPersonBag(string sourceName)
@@ -249,34 +352,69 @@ public unsafe class NaviMapManager : IDisposable
         return dict.TryAdd((int)personIndex, details);
     }
 
+    /// <summary>
+    /// 從某個來源的清單裡移除一個人(依 <c>GameObjectId</c>)。不在清單裡時回 <see langword="false"/>。
+    /// </summary>
+    /// <remarks>
+    /// 🔴 找不到時<b>不可以擲例外</b>:<see cref="Api.ApiController"/> 的類別註解承諾「移除不在清單裡的人是安全的,會回 false」,
+    /// 而這一支同時掛在兩條路徑上——<b>繪製路徑</b>(<c>MarkerUtility.PrepareDrawOnMinimap</c>)擲例外會讓疊加層被換成錯誤訊息;
+    /// <b>IPC 端點</b>擲例外時呼叫端拿到的是 <c>TargetInvocationException</c>,跨插件慣用的 <c>catch (IpcError)</c> 攔不到它。
+    /// </remarks>
     public bool RemoveFromBag(ulong id, string sourceName)
     {
-        PersonDict.TryGetValue(sourceName, out var dict);
-        if (dict == null)
+        if (!PersonDict.TryGetValue(sourceName, out var dict) || dict == null)
         {
             return false;
         }
-        var entry = dict.First(x => x.Value.Id == id);
-        return dict.TryRemove(entry);
 
+        foreach (var entry in dict)
+        {
+            if (entry.Value.Id != id)
+            {
+                continue;
+            }
+
+            return dict.TryRemove(entry);
+        }
+
+        return false;
     }
 
+    /// <summary>依名稱移除。找不到時回 <see langword="false"/>(理由同 <c>GameObjectId</c> 那個多載)。</summary>
     public bool RemoveFromBag(string name, string sourceName)
     {
-        PersonDict.TryGetValue(sourceName, out var dict);
-        if (dict == null)
+        if (!PersonDict.TryGetValue(sourceName, out var dict) || dict == null)
         {
             return false;
         }
-        var entry = dict.First(x => x.Value.Name == name);
-        return dict.TryRemove(entry);
 
+        foreach (var entry in dict)
+        {
+            if (entry.Value.Name != name)
+            {
+                continue;
+            }
+
+            return dict.TryRemove(entry);
+        }
+
+        return false;
     }
 
+    /// <summary>
+    /// 整個來源連同它的人一起移除。
+    /// </summary>
+    /// <remarks>
+    /// ⚠️ 這條路徑只有 IPC 消費端走得到(內建的三個來源從不移除)。
+    /// </remarks>
     public bool RemoveSourceAndPeople(string sourceName)
     {
         var successPerson = ClearPersonBag(sourceName);
         var successSource = SourceDataDict.TryRemove(sourceName, out _);
+
+        // 🔑 鍵本身也要拿掉,否則留下一個「有人清單、沒有來源設定」的孤兒鍵。
+        PersonDict.TryRemove(sourceName, out _);
+        _sources = null;
 
         return successPerson && successSource;
     }
@@ -284,6 +422,7 @@ public unsafe class NaviMapManager : IDisposable
     public void Dispose()
     {
         PersonDict.Clear();
+        _sources = null;
         SourceDataDict.Clear();
     }
 

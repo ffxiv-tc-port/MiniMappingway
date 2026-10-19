@@ -51,6 +51,9 @@ public class PluginUi : IDisposable
             {
                 ImGui.PushID(source.Key);
                 var sourceDataLocal = new SourceData(source.Value);
+                // Values are applied to sourceDataLocal immediately (live preview), but the
+                // config file is only written once editing on a widget actually finishes.
+                var shouldSave = false;
                 if (ImGui.BeginListBox($"##list{source.Key}", new Vector2(-1, 210)))
                 {
                     ImGui.Text(source.Key);
@@ -60,6 +63,7 @@ public class PluginUi : IDisposable
                     {
                         sourceDataLocal.Enabled = enabledLocal;
                     }
+                    if (ImGui.IsItemDeactivatedAfterEdit()) shouldSave = true;
 
                     ImGui.SameLine(90);
 
@@ -90,6 +94,7 @@ public class PluginUi : IDisposable
 
                             sourceDataLocal.Priority = tempPriority;
                         }
+                        if (ImGui.IsItemDeactivatedAfterEdit()) shouldSave = true;
                         isPriorityError = ServiceManager.NaviMapManager.SourceDataDict.Any(x => x.Value.Priority == tempPriority && x.Key != source.Key);
 
                         ImGui.PopItemWidth();
@@ -115,17 +120,20 @@ public class PluginUi : IDisposable
                         sourceDataLocal.BorderValid = false;
 
                     }
+                    if (ImGui.IsItemDeactivatedAfterEdit()) shouldSave = true;
                     var circleSizeLocal = source.Value.CircleSize;
                     if (ImGui.SliderInt("Circle Size", ref circleSizeLocal, 1, 20))
                     {
                         sourceDataLocal.CircleSize = circleSizeLocal;
                     }
+                    if (ImGui.IsItemDeactivatedAfterEdit()) shouldSave = true;
 
                     var border = sourceDataLocal.ShowBorder;
                     if (ImGui.Checkbox("Show Border", ref border))
                     {
                         sourceDataLocal.ShowBorder = border;
                     }
+                    if (ImGui.IsItemDeactivatedAfterEdit()) shouldSave = true;
 
                     var darkeningAmount = sourceDataLocal.BorderDarkeningAmount;
                     if (ImGui.SliderFloat("Border Brightness", ref darkeningAmount, 0.0f, 2f))
@@ -133,12 +141,14 @@ public class PluginUi : IDisposable
                         sourceDataLocal.BorderDarkeningAmount = darkeningAmount;
                         sourceDataLocal.BorderValid = false;
                     }
+                    if (ImGui.IsItemDeactivatedAfterEdit()) shouldSave = true;
 
                     var borderRadius = sourceDataLocal.BorderRadius;
                     if (ImGui.SliderInt("Border Radius", ref borderRadius, 1, 10))
                     {
                         sourceDataLocal.BorderRadius = borderRadius;
                     }
+                    if (ImGui.IsItemDeactivatedAfterEdit()) shouldSave = true;
 
                     ServiceManager.NaviMapManager.SourceDataDict.AddOrUpdate(source.Key, sourceDataLocal, (_, _) => sourceDataLocal);
                     if (sourceDataLocal != ServiceManager.Configuration.SourceConfigs[source.Key])
@@ -148,7 +158,10 @@ public class PluginUi : IDisposable
                             ServiceManager.Configuration.SourceConfigs[source.Key] = sourceDataLocal;
 
                         }
-                        ServiceManager.Configuration.Save();
+                        if (shouldSave)
+                        {
+                            ServiceManager.Configuration.Save();
+                        }
                     }
                     ImGui.EndListBox();
 

@@ -59,5 +59,284 @@ namespace MiniMappingway.Properties {
                 resourceCulture = value;
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Border Brightness.
+        /// </summary>
+        internal static string BorderBrightness {
+            get {
+                return ResourceManager.GetString("BorderBrightness", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Border Radius.
+        /// </summary>
+        internal static string BorderRadius {
+            get {
+                return ResourceManager.GetString("BorderRadius", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Circle Size.
+        /// </summary>
+        internal static string CircleSize {
+            get {
+                return ResourceManager.GetString("CircleSize", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Opens Mini-Mappingway settings.
+        /// </summary>
+        internal static string CommandHelpMessage {
+            get {
+                return ResourceManager.GetString("CommandHelpMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enabled.
+        /// </summary>
+        internal static string Enabled {
+            get {
+                return ResourceManager.GetString("Enabled", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;Everyone&quot; is always the lowest priority.
+        /// </summary>
+        internal static string EveryoneLowestPriority {
+            get {
+                return ResourceManager.GetString("EveryoneLowestPriority", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to If you have a common FC tag you may wish to disable this..
+        /// </summary>
+        internal static string FcTagCommonNotice {
+            get {
+                return ResourceManager.GetString("FcTagCommonNotice", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to For now FC members are found by comparing FC tags..
+        /// </summary>
+        internal static string FcTagComparisonNotice {
+            get {
+                return ResourceManager.GetString("FcTagComparisonNotice", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Marker Colour. Click the colored square for a picker..
+        /// </summary>
+        internal static string MarkerColourDescription {
+            get {
+                return ResourceManager.GetString("MarkerColourDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Marker settings, ordered by priority:.
+        /// </summary>
+        internal static string MarkerSettingsHeader {
+            get {
+                return ResourceManager.GetString("MarkerSettingsHeader", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Priority, higher shows on top of lower.
+        /// </summary>
+        internal static string PriorityDescription {
+            get {
+                return ResourceManager.GetString("PriorityDescription", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Priority {0} is already taken.
+        /// </summary>
+        internal static string PriorityTaken {
+            get {
+                return ResourceManager.GetString("PriorityTaken", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Dot radius.
+        /// </summary>
+        internal static string PvpRadarDotRadius {
+            get {
+                return ResourceManager.GetString("PvpRadarDotRadius", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enable PvP player radar (on-screen dots).
+        /// </summary>
+        internal static string PvpRadarEnabled {
+            get {
+                return ResourceManager.GetString("PvpRadarEnabled", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enemy colour.
+        /// </summary>
+        internal static string PvpRadarEnemyColor {
+            get {
+                return ResourceManager.GetString("PvpRadarEnemyColor", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Friendly colour.
+        /// </summary>
+        internal static string PvpRadarFriendlyColor {
+            get {
+                return ResourceManager.GetString("PvpRadarFriendlyColor", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to PvP Player Radar.
+        /// </summary>
+        internal static string PvpRadarHeader {
+            get {
+                return ResourceManager.GetString("PvpRadarHeader", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Hide friendly players.
+        /// </summary>
+        internal static string PvpRadarHideFriendly {
+            get {
+                return ResourceManager.GetString("PvpRadarHideFriendly", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Projects nearby players onto the screen. Intended for Frontline and other PvP areas..
+        /// </summary>
+        internal static string PvpRadarNotice {
+            get {
+                return ResourceManager.GetString("PvpRadarNotice", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Only show dots (no player names).
+        /// </summary>
+        internal static string PvpRadarOnlyDot {
+            get {
+                return ResourceManager.GetString("PvpRadarOnlyDot", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Also show outside PvP areas.
+        /// </summary>
+        internal static string PvpRadarOutsidePvp {
+            get {
+                return ResourceManager.GetString("PvpRadarOutsidePvp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Show lines from players who target you.
+        /// </summary>
+        internal static string PvpRadarShowTargetingMeLines {
+            get {
+                return ResourceManager.GetString("PvpRadarShowTargetingMeLines", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}+ targeting you.
+        /// </summary>
+        internal static string PvpRadarTargetingMeCount {
+            get {
+                return ResourceManager.GetString("PvpRadarTargetingMeCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Also show unconfirmed lines (gaze target only).
+        /// </summary>
+        internal static string PvpRadarTargetingMeIncludeGaze {
+            get {
+                return ResourceManager.GetString("PvpRadarTargetingMeIncludeGaze", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Targeting line colour.
+        /// </summary>
+        internal static string PvpRadarTargetingMeLineColor {
+            get {
+                return ResourceManager.GetString("PvpRadarTargetingMeLineColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Targeting line thickness.
+        /// </summary>
+        internal static string PvpRadarTargetingMeLineThickness {
+            get {
+                return ResourceManager.GetString("PvpRadarTargetingMeLineThickness", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Draws a line from every player who has you targeted. Only players the client actually receives can be checked, so the count is a lower bound (shown with a +), and nobody who cannot be projected onto the screen (for example behind you) gets a line..
+        /// </summary>
+        internal static string PvpRadarTargetingMeNotice {
+            get {
+                return ResourceManager.GetString("PvpRadarTargetingMeNotice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show how many players have you targeted.
+        /// </summary>
+        internal static string PvpRadarTargetingMeShowCount {
+            get {
+                return ResourceManager.GetString("PvpRadarTargetingMeShowCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Frontline team colours (by battalion; your own team uses the friendly colour):.
+        /// </summary>
+        internal static string PvpRadarTeamColorsNote {
+            get {
+                return ResourceManager.GetString("PvpRadarTeamColorsNote", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Mini-Mappingway Settings.
+        /// </summary>
+        internal static string SettingsWindowTitle {
+            get {
+                return ResourceManager.GetString("SettingsWindowTitle", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Show Border.
+        /// </summary>
+        internal static string ShowBorder {
+            get {
+                return ResourceManager.GetString("ShowBorder", resourceCulture);
+            }
+        }
     }
 }

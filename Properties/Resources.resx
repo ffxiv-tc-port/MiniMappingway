@@ -98,4 +98,97 @@
 	<resheader name="writer">
 		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
 	</resheader>
+	<data name="BorderBrightness" xml:space="preserve">
+		<value>Border Brightness</value>
+	</data>
+	<data name="BorderRadius" xml:space="preserve">
+		<value>Border Radius</value>
+	</data>
+	<data name="CircleSize" xml:space="preserve">
+		<value>Circle Size</value>
+	</data>
+	<data name="CommandHelpMessage" xml:space="preserve">
+		<value>Opens Mini-Mappingway settings</value>
+	</data>
+	<data name="Enabled" xml:space="preserve">
+		<value>Enabled</value>
+	</data>
+	<data name="EveryoneLowestPriority" xml:space="preserve">
+		<value>"Everyone" is always the lowest priority</value>
+	</data>
+	<data name="FcTagCommonNotice" xml:space="preserve">
+		<value>If you have a common FC tag you may wish to disable this.</value>
+	</data>
+	<data name="FcTagComparisonNotice" xml:space="preserve">
+		<value>For now FC members are found by comparing FC tags.</value>
+	</data>
+	<data name="MarkerColourDescription" xml:space="preserve">
+		<value>Marker Colour. Click the colored square for a picker.</value>
+	</data>
+	<data name="MarkerSettingsHeader" xml:space="preserve">
+		<value>Marker settings, ordered by priority:</value>
+	</data>
+	<data name="PriorityDescription" xml:space="preserve">
+		<value>Priority, higher shows on top of lower</value>
+	</data>
+	<data name="PriorityTaken" xml:space="preserve">
+		<value>Priority {0} is already taken</value>
+	</data>
+	<data name="SettingsWindowTitle" xml:space="preserve">
+		<value>Mini-Mappingway Settings</value>
+	</data>
+	<data name="ShowBorder" xml:space="preserve">
+		<value>Show Border</value>
+	</data>
+	<data name="PvpRadarDotRadius" xml:space="preserve">
+		<value>Dot radius</value>
+	</data>
+	<data name="PvpRadarEnabled" xml:space="preserve">
+		<value>Enable PvP player radar (on-screen dots)</value>
+	</data>
+	<data name="PvpRadarEnemyColor" xml:space="preserve">
+		<value>Enemy colour</value>
+	</data>
+	<data name="PvpRadarFriendlyColor" xml:space="preserve">
+		<value>Friendly colour</value>
+	</data>
+	<data name="PvpRadarHeader" xml:space="preserve">
+		<value>PvP Player Radar</value>
+	</data>
+	<data name="PvpRadarHideFriendly" xml:space="preserve">
+		<value>Hide friendly players</value>
+	</data>
+	<data name="PvpRadarNotice" xml:space="preserve">
+		<value>Projects nearby players onto the screen. Intended for Frontline and other PvP areas.</value>
+	</data>
+	<data name="PvpRadarOnlyDot" xml:space="preserve">
+		<value>Only show dots (no player names)</value>
+	</data>
+	<data name="PvpRadarOutsidePvp" xml:space="preserve">
+		<value>Also show outside PvP areas</value>
+	</data>
+	<data name="PvpRadarShowTargetingMeLines" xml:space="preserve">
+		<value>Show lines from players who target you</value>
+	</data>
+	<data name="PvpRadarTargetingMeCount" xml:space="preserve">
+		<value>{0}+ targeting you</value>
+	</data>
+	<data name="PvpRadarTargetingMeIncludeGaze" xml:space="preserve">
+		<value>Also show unconfirmed lines (gaze target only)</value>
+	</data>
+	<data name="PvpRadarTargetingMeLineColor" xml:space="preserve">
+		<value>Targeting line colour</value>
+	</data>
+	<data name="PvpRadarTargetingMeLineThickness" xml:space="preserve">
+		<value>Targeting line thickness</value>
+	</data>
+	<data name="PvpRadarTargetingMeNotice" xml:space="preserve">
+		<value>Draws a line from every player who has you targeted. Only players the client actually receives can be checked, so the count is a lower bound (shown with a +), and nobody who cannot be projected onto the screen (for example behind you) gets a line.</value>
+	</data>
+	<data name="PvpRadarTargetingMeShowCount" xml:space="preserve">
+		<value>Show how many players have you targeted</value>
+	</data>
+	<data name="PvpRadarTeamColorsNote" xml:space="preserve">
+		<value>Frontline team colours (by battalion; your own team uses the friendly colour):</value>
+	</data>
 </root>

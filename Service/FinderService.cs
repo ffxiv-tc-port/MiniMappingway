@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
@@ -6,6 +7,7 @@ using MiniMappingway.Manager;
 using MiniMappingway.Model;
 using MiniMappingway.Utility;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -17,9 +19,8 @@ public sealed class FinderService : IDisposable
     public const string FcMembersKey = "FC Members";
     public const string FriendKey = "Friends";
     public const string EveryoneKey = "Everyone";
-    private readonly IEnumerable<int> _enumerable;
-    private IEnumerator<int> _enumerator;
-    private int _index;
+    // 每幀檢查一格：物件表的偶數格 2、4、…、200（玩家角色），看完從頭再來。
+    private int _index = 2;
 
     public FinderService()
     {
@@ -27,12 +28,6 @@ public sealed class FinderService : IDisposable
         ServiceManager.NaviMapManager.AddOrUpdateSource(FcMembersKey, new Vector4(1, 0, 0, 1));
         ServiceManager.NaviMapManager.AddOrUpdateSource(EveryoneKey, new Vector4(0, 0.7f, 0.7f, 1));
         ServiceManager.Framework.Update += Iterate;
-
-        _enumerable = Enumerable.Range(2, 200).Where(x => x % 2 == 0);
-        _enumerator = _enumerable.GetEnumerator();
-        _enumerator.MoveNext();
-        _index = _enumerator.Current;
-
     }
 
     private void Iterate(IFramework framework)
@@ -41,21 +36,17 @@ public sealed class FinderService : IDisposable
         CheckNewPeople(_index);
         CheckSamePerson(_index);
 
-        var iteratorValid = _enumerator.MoveNext();
-        if (!iteratorValid)
-        {
-            _enumerator = _enumerable.GetEnumerator();
-            _enumerator.MoveNext();
-
-        }
-        _index = _enumerator.Current;
+        _index = _index >= 200 ? 2 : _index + 2;
     }
 
     private static void CheckSamePerson(in int i)
     {
-        foreach (var dict in ServiceManager.NaviMapManager.PersonDict)
+        foreach (var dict in ServiceManager.NaviMapManager.Sources)
         {
-            if (!ServiceManager.NaviMapManager.SourceDataDict[dict.Key].Enabled)
+            // 🔴 索引器對「已經被 IPC 移除的來源」會擲 KeyNotFoundException,
+            //    而這一支掛在 Framework.Update 上 ⇒ 每幀擲一次。
+            if (!ServiceManager.NaviMapManager.SourceDataDict.TryGetValue(dict.Key, out var sourceData)
+                || !sourceData.Enabled)
             {
                 continue;
             }
@@ -65,30 +56,54 @@ public sealed class FinderService : IDisposable
                 continue;
             }
 
-            if (ServiceManager.ObjectTable[i] == null)
+            // ⚠️ 每次都從物件表重查,不要解參考 PersonDetails.Ptr。
+            // Ptr 是這個人被記錄「當下」的原始位址;之後 slot 可能被釋放或換人,
+            // 「該索引有東西」(ObjectTable[i] != null)不代表還是同一個人。
+            // 下面的 try/catch 也不是防護:AccessViolationException 在 .NET Core
+            // 是 corrupted-state exception,catch 不到。
+            var current = ServiceManager.ObjectTable[i];
+            if (current == null)
             {
                 continue;
             }
-            var ptr = person.Ptr;
+
+            // 外部來源(IPC)標的可能不是玩家。那條路徑一個 Character* 都不轉,
+            // 身分比對改用 GameObjectId(位址相同不代表還是同一個東西)。
+            if (person.AnyObjectKind)
+            {
+                if (current.GameObjectId != person.Id)
+                {
+                    ServiceManager.NaviMapManager.RemoveFromBag(person.Id, dict.Key);
+                }
+
+                continue;
+            }
+
+            // 位址不符代表這個 slot 已經換人,原本記錄的位址不可再解參考。
+            if (current.Address != person.Ptr)
+            {
+                ServiceManager.NaviMapManager.RemoveFromBag(person.Id, dict.Key);
+                continue;
+            }
+
             unsafe
             {
-                try
-                {
-                    var charPointer = (Character*)ptr;
-                    if ((byte)charPointer->GameObject.ObjectKind != (byte)ObjectKind.Player)
-                    {
-                        ServiceManager.NaviMapManager.RemoveFromBag(person.Id, dict.Key);
-                        continue;
-                    }
-                }
-                catch(Exception)
+                // 走這次重查到的位址(本幀剛從物件表解析出來,確定是活的)。
+                var charPointer = (Character*)current.Address;
+                if ((byte)charPointer->GameObject.ObjectKind != (byte)ObjectKind.Player)
                 {
                     ServiceManager.NaviMapManager.RemoveFromBag(person.Id, dict.Key);
                     continue;
                 }
 
+                // 名字欄位跟加入當下逐位元組相同就是同一個名字；不同才照原樣轉成字串比。
+                if (person.NameBytes is { } nameBytes && charPointer->GameObject.Name.SequenceEqual(nameBytes))
+                {
+                    continue;
+                }
             }
-            if (ServiceManager.ObjectTable[i]?.Name.ToString() != person.Name)
+
+            if (current.Name.ToString() != person.Name)
             {
                 ServiceManager.NaviMapManager.RemoveFromBag(person.Id, dict.Key);
             }
@@ -134,9 +149,11 @@ public sealed class FinderService : IDisposable
             {
                 return;
             }
-            if (!player->FreeCompanyTagString.IsNullOrEmpty())
+            // 第一個位元組不是 0 ＝ 有公會簡稱（不必為了判空把它轉成字串）。
+            var localFc = player->FreeCompanyTag;
+            if (localFc[0] != 0)
             {
-                fc = player->FreeCompanyTag;
+                fc = localFc;
             }
         }
         catch
@@ -158,12 +175,12 @@ public sealed class FinderService : IDisposable
             return;
         }
 
-        if (friendDict.Any(x => x.Value.Id == obj.GameObjectId) && friendConfig.Enabled)
+        if (friendConfig.Enabled && ContainsId(friendDict, obj))
         {
             alreadyInFriendBag = true;
         }
 
-        if (fcDict.Any(x => x.Value.Id == obj.GameObjectId) && fcConfig.Enabled)
+        if (fcConfig.Enabled && ContainsId(fcDict, obj))
         {
             alreadyInFcBag = true;
         }
@@ -193,7 +210,7 @@ public sealed class FinderService : IDisposable
         {
             if (charPointer->IsFriend)
             {
-                var personDetails = new PersonDetails(obj.Name.ToString(), obj.GameObjectId, FriendKey, obj.Address);
+                var personDetails = new PersonDetails(obj.Name.ToString(), obj.GameObjectId, FriendKey, obj.Address) { NameBytes = charPointer->GameObject.Name.ToArray() };
                 alreadyInFriendBag = true;
                 ServiceManager.NaviMapManager.AddToBag(personDetails);
 
@@ -209,7 +226,7 @@ public sealed class FinderService : IDisposable
                 if (playerFc.SequenceEqual(tempFc))
                 {
 
-                    var personDetails = new PersonDetails(obj.Name.ToString(), obj.GameObjectId, FcMembersKey, obj.Address);
+                    var personDetails = new PersonDetails(obj.Name.ToString(), obj.GameObjectId, FcMembersKey, obj.Address) { NameBytes = charPointer->GameObject.Name.ToArray() };
                     alreadyInFcBag = true;
                     ServiceManager.NaviMapManager.AddToBag(personDetails);
                 }
@@ -218,11 +235,31 @@ public sealed class FinderService : IDisposable
 
         if (!alreadyInFcBag && !alreadyInFriendBag && everyoneConfig.Enabled)
         {
-            var personDetails = new PersonDetails(obj.Name.ToString(), obj.GameObjectId, EveryoneKey, obj.Address);
+            var personDetails = new PersonDetails(obj.Name.ToString(), obj.GameObjectId, EveryoneKey, obj.Address) { NameBytes = charPointer->GameObject.Name.ToArray() };
 
             ServiceManager.NaviMapManager.AddToBag(personDetails);
 
         }
+    }
+
+    // 這一格的物件是不是已經在清單裡。每幀都會問，所以不用 LINQ（lambda 捕獲 obj ＝ 每幀一個閉包加兩個委派）。
+    private static bool ContainsId(ConcurrentDictionary<int, PersonDetails> dict, IGameObject obj)
+    {
+        if (dict.IsEmpty)
+        {
+            return false;
+        }
+
+        var id = obj.GameObjectId;
+        foreach (var entry in dict)
+        {
+            if (entry.Value.Id == id)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void Dispose()
