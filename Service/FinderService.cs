@@ -235,6 +235,14 @@ public sealed class FinderService : IDisposable
 
         if (!alreadyInFcBag && !alreadyInFriendBag && everyoneConfig.Enabled)
         {
+            // 與 AddToBag 同一個鍵：已在名單上時它的 TryAdd 本來就不會加，先判掉就不必組名字。
+            if (!ServiceManager.NaviMapManager.PersonDict.TryGetValue(EveryoneKey, out var everyoneDict) || everyoneDict == null
+                || MarkerUtility.GetObjIndexById(obj.GameObjectId) is not { } everyoneIndex
+                || everyoneDict.ContainsKey(everyoneIndex))
+            {
+                return;
+            }
+
             var personDetails = new PersonDetails(obj.Name.ToString(), obj.GameObjectId, EveryoneKey, obj.Address) { NameBytes = charPointer->GameObject.Name.ToArray() };
 
             ServiceManager.NaviMapManager.AddToBag(personDetails);
